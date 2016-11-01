@@ -1,7 +1,7 @@
 import sys
 sys.setrecursionlimit(8000)
 
-INPUT = open("day1_input.txt").read().strip()
+INPUT = open("day01_input.txt").read().strip()
 
 def delta_floor(c):
     return 1 if c == "(" else -1
