@@ -34,3 +34,13 @@ assert find_floor2("))(") == -1
 assert find_floor2(")))") == -3
 assert find_floor2(")())())") == -3
 print find_floor2(open("day1_input.txt").read().strip())
+
+def pos_basement(input):
+    return reduce(lambda a, d: {'hit': True, 'pos': a['pos'], 'floor': a['floor'] + d} if (a['hit'] or (a['floor'] == 0 and d == -1)) else {'hit': a['hit'], 'pos': a['pos'] + 1, 'floor': a['floor'] + d},
+                  map(delta_floor, list(input)),
+                  {'hit': False, 'pos': 1, 'floor': 0}
+    )['pos']
+
+assert pos_basement(")") == 1
+assert pos_basement("()())") == 5
+print pos_basement(open("day1_input.txt").read().strip())
