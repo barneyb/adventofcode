@@ -1,10 +1,10 @@
-
 import sys
 sys.setrecursionlimit(8000)
 
+INPUT = open("day1_input.txt").read().strip()
+
 def delta_floor(c):
     return 1 if c == "(" else -1
-    
 
 def find_floor(input):
     return delta_floor(input[0]) + (find_floor(input[1:]) if len(input) > 1 else 0)
@@ -18,7 +18,7 @@ assert find_floor("())") == -1
 assert find_floor("))(") == -1
 assert find_floor(")))") == -3
 assert find_floor(")())())") == -3
-print find_floor(open("day1_input.txt").read().strip())
+print find_floor(INPUT)
 
 def find_floor2(input):
     return reduce(lambda a, b: a + b,
@@ -33,7 +33,7 @@ assert find_floor2("())") == -1
 assert find_floor2("))(") == -1
 assert find_floor2(")))") == -3
 assert find_floor2(")())())") == -3
-print find_floor2(open("day1_input.txt").read().strip())
+print find_floor2(INPUT)
 
 def pos_basement(input):
     return reduce(lambda a, d: {'hit': True, 'pos': a['pos'], 'floor': a['floor'] + d} if (a['hit'] or (a['floor'] == 0 and d == -1)) else {'hit': a['hit'], 'pos': a['pos'] + 1, 'floor': a['floor'] + d},
@@ -43,4 +43,4 @@ def pos_basement(input):
 
 assert pos_basement(")") == 1
 assert pos_basement("()())") == 5
-print pos_basement(open("day1_input.txt").read().strip())
+print pos_basement(INPUT)
