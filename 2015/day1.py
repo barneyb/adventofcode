@@ -42,5 +42,7 @@ def pos_basement(input):
     )['pos']
 
 assert pos_basement(")") == 1
+assert pos_basement(")))((") == 1
 assert pos_basement("()())") == 5
+assert pos_basement("()())(())") == 5
 print pos_basement(INPUT)
