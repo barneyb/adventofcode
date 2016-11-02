@@ -8,7 +8,7 @@ function label() {
     echo "# $1"
 }
 
-for i in `ls *.py`; do
+for i in `ls *.py | sort`; do
     bar
     label $i
     python $i
