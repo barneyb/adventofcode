@@ -1,5 +1,5 @@
 import unittest
-from operator import add
+from operator import add, mul
 
 INPUT = open("day02_input.txt").read().strip()
 
@@ -15,7 +15,7 @@ def paper_for_present(d):
     return reduce(add, map(lambda n: 2 * n, sides)) + min(sides)
 
 def ribbon_for_present(d):
-    return 2 * d[0] + 2 * d[1] + reduce(lambda a, n: a * n, d)
+    return 2 * d[0] + 2 * d[1] + reduce(mul, d)
 
 def paper_for_presents(specs):
     return total_for_presents(paper_for_present, specs)
