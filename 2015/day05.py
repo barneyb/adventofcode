@@ -22,8 +22,33 @@ def is_nice(s):
         'ab', 'cd', 'pq', 'xy'
     ])
 
-def count_nice(text):
-    return len(filter(is_nice, text.split("\n")))
+def has_dupe_letter_pair(s):
+    return any(map(
+        lambda i: s.find(s[i:i+2], i+2) >= i,
+        xrange(0, len(s) - 2)))
+
+def has_split_double(s):
+    return any(map(
+        lambda i: s[i] == s[i + 2],
+        xrange(0, len(s) - 2)))
+
+def is_nice2(s):
+    return has_dupe_letter_pair(s) and has_split_double(s);
+
+def count_nice(test, text):
+    return len(filter(test, text.split("\n")))
+
+class TestHasDupeLetterPair(unittest.TestCase):
+    def testAbab(self):
+        self.assertTrue(has_dupe_letter_pair("abab"))
+    def testAbxab(self):
+        self.assertTrue(has_dupe_letter_pair("abxab"))
+    def testAaa(self):
+        self.assertFalse(has_dupe_letter_pair("aaa"))
+    def testAaaa(self):
+        self.assertTrue(has_dupe_letter_pair("aaaa"))
+    def testAaxaa(self):
+        self.assertTrue(has_dupe_letter_pair("aaxaa"))
 
 class TestExamples(unittest.TestCase):
 
@@ -42,9 +67,28 @@ class TestExamples(unittest.TestCase):
     def testFive(self):
         self.assertFalse(is_nice("dvszwmarrgswjxmb"))
 
+    def testSix(self):
+        self.assertTrue(is_nice2("qjhvhtzxzqqjkmpb"))
+
+    def testSeven(self):
+        self.assertTrue(is_nice2("xxyxx"))
+
+    def testEight(self):
+        self.assertFalse(is_nice2("uurcxstgmygtbstg"))
+
+    def testNine(self):
+        self.assertFalse(is_nice2("ieodomkazucvgmuy"))
+
+    def testPathological(self):
+        self.assertFalse(is_nice2("aaa"))
+        self.assertTrue(is_nice2("xyxy"))
+
 class TestParts(unittest.TestCase):
 
     def testPartOne(self):
-        self.assertEqual(count_nice(INPUT), 258)
+        self.assertEqual(count_nice(is_nice, INPUT), 258)
+
+    def testPartTwo(self):
+        self.assertEqual(count_nice(is_nice2, INPUT), 53)
 
 unittest.main()
