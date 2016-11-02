@@ -7,9 +7,6 @@ INPUT = "ckczppom"
 def md5(string):
     return hashlib.md5(string).hexdigest()
 
-def mash(items):
-    return reduce(lambda a, it: a + str(it), items, "")
-
 def first_coin(key, prefix="00000"):
     return 1 + max(takewhile(
         lambda n: not md5(key + str(n)).startswith(prefix),
@@ -21,17 +18,6 @@ class TestMd5(unittest.TestCase):
         self.assertEqual(
             md5("i eat popsicles"),
             "1122c07697c645c2602e7360f5ca5483")
-
-class TestMash(unittest.TestCase):
-
-    def testEmpty(self):
-        self.assertEqual(mash([]), "")
-
-    def testSingle(self):
-        self.assertEqual(mash(["one"]), "one")
-
-    def testMany(self):
-        self.assertEqual(mash(["one", "two", "three"]), "onetwothree")
 
 class TestExamples(unittest.TestCase):
 
