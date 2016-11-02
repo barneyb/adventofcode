@@ -6,13 +6,15 @@ INPUT = open("day02_input.txt").read().strip()
 def present_dim(spec):
     return sorted(map(int, spec.split("x")))
 
-def paper_for_present(d):
-    sides = [
+def sides(d):
+    return [
         d[0] * d[1],
         d[1] * d[2],
         d[2] * d[0]
     ]
-    return reduce(add, map(lambda n: 2 * n, sides)) + min(sides)
+
+def paper_for_present(d):
+    return reduce(add, map(lambda n: 2 * n, sides(d))) + min(sides(d))
 
 def ribbon_for_present(d):
     return 2 * d[0] + 2 * d[1] + reduce(mul, d)
@@ -27,7 +29,7 @@ def total_for_presents(to_num, specs):
     return reduce(add, map(to_num, map(present_dim, specs.split("\n"))))
 
 class TestPresentDim(unittest.TestCase):
-    
+
     def testOne(self):
         self.assertEqual(present_dim('1x2x3'), [1, 2, 3])
 
