@@ -8,7 +8,7 @@ function label() {
     echo "# $1"
 }
 
-for i in `ls *.* | egrep '.*\.(py|hs)$' | sort`; do
+for i in `ls *.* | egrep '.*\.(py)$' | sort`; do
     bar
     label $i
     if [ `echo $i | cut -d . -f 2` == "py" ]; then
