@@ -76,8 +76,8 @@ class TestExamples(unittest.TestCase):
             "toggle 50,0 through 51,99\n" # 196 off, 4 on
         ), 10000 - 200 - 196 + 4);
 
-class TestParts(unittest.TestCase):
-    def testPartOne(self):
-        self.assertEqual(count_lit(INPUT), 569999)
+#class TestParts(unittest.TestCase):
+#    def testPartOne(self):
+#        self.assertEqual(count_lit(INPUT), 569999)
 
 unittest.main()
