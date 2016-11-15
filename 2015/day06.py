@@ -27,24 +27,21 @@ def get_range(ins):
             xrange(int(ins[1].real), int(ins[2].real) + 1)),
         [])
 
-def do_ins_on(lit, ins_range):
-    return lit | ins_range;
-
-def do_ins_off(lit, ins_range):
-    return get_outside(lit, ins_range)
-
 def get_outside(base, target):
     return base - target
 
-def do_ins_toggle(lit, ins_range):
-    return frozenset(filter(
+instructions_one = {
+    'on': lambda lit, ins_range: lit | ins_range,
+    'off': get_outside,
+    'toggle': lambda lit, ins_range: frozenset(filter(
         lambda i: i != None,
         map(
             lambda i: None if i in lit else i,
             ins_range))) | get_outside(lit, ins_range)
+}
 
 def do_ins(lit, ins):
-    return (do_ins_on if ins[0] == 'on' else do_ins_off if ins[0] == 'off' else do_ins_toggle)(lit, frozenset(get_range(ins)))
+    return instructions_one[ins[0]](lit, frozenset(get_range(ins)))
 
 def count_lit(ins_list):
     return len(reduce(do_ins, parse_ins_list(ins_list), frozenset()))
