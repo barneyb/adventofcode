@@ -18,14 +18,14 @@ def parse_ins_list(ins_list):
         ins_list.split("\n")))
 
 def get_range(ins):
-    return frozenset(reduce(
+    return reduce(
         lambda r, i: r + i,
         map(
             lambda r: map(
                 lambda c: complex(r, c),
                 xrange(int(ins[1].imag), int(ins[2].imag) + 1)),
             xrange(int(ins[1].real), int(ins[2].real) + 1)),
-        []))
+        [])
 
 def do_ins_on(lit, ins_range):
     return lit | ins_range;
@@ -44,10 +44,31 @@ def do_ins_toggle(lit, ins_range):
             ins_range))) | get_outside(lit, ins_range)
 
 def do_ins(lit, ins):
-    return (do_ins_on if ins[0] == 'on' else do_ins_off if ins[0] == 'off' else do_ins_toggle)(lit, get_range(ins))
+    return (do_ins_on if ins[0] == 'on' else do_ins_off if ins[0] == 'off' else do_ins_toggle)(lit, frozenset(get_range(ins)))
 
 def count_lit(ins_list):
     return len(reduce(do_ins, parse_ins_list(ins_list), frozenset()))
+
+def do_sum_on(grid, ins_range):
+    for c in ins_range:
+        grid[c] = grid.get(c, 0) + 1
+    return grid
+
+def do_sum_off(grid, ins_range):
+    for c in ins_range:
+        grid[c] = max(0, grid.get(c, 0) - 1)
+    return grid
+
+def do_sum_toggle(grid, ins_range):
+    for c in ins_range:
+        grid[c] = grid.get(c, 0) + 2
+    return grid
+
+def do_sum(grid, ins):
+    return (do_sum_on if ins[0] == 'on' else do_sum_off if ins[0] == 'off' else do_sum_toggle)(grid, get_range(ins))
+
+def sum_brightness(ins_list):
+    return sum(reduce(do_sum, parse_ins_list(ins_list), dict()).values())
 
 class TestExamples(unittest.TestCase):
 
@@ -76,8 +97,44 @@ class TestExamples(unittest.TestCase):
             "toggle 50,0 through 51,99\n" # 196 off, 4 on
         ), 10000 - 200 - 196 + 4);
 
+class TestExamplesTwo(unittest.TestCase):
+
+    def testZero(self):
+        self.assertEqual(sum_brightness("turn off 0,0 through 0,0"), 0)
+
+    def testOn(self):
+        self.assertEqual(sum_brightness(
+            "turn on 1,1 through 5,5\n" + 
+            "turn on 1,1 through 5,5"
+        ), 50)
+
+    def testOff(self):
+        self.assertEqual(sum_brightness(
+            "turn on 1,1 through 5,5\n" + 
+            "turn on 1,1 through 5,5\n" + 
+            "turn off 1,1 through 5,5"
+        ), 25)
+
+    def testOffLowerBound(self):
+        self.assertEqual(sum_brightness(
+            "turn on 1,1 through 5,5\n" + 
+            "turn off 1,1 through 5,5\n" + 
+            "turn off 1,1 through 5,5\n" + 
+            "turn off 1,1 through 5,5"
+        ), 0)
+
+    def testToggle(self):
+        self.assertEqual(sum_brightness(
+            "toggle 1,1 through 5,5\n" + 
+            "toggle 1,1 through 5,5"
+        ), 100)
+
+
 #class TestParts(unittest.TestCase):
 #    def testPartOne(self):
 #        self.assertEqual(count_lit(INPUT), 569999)
+#
+#    def testPartTwo(self):
+#        self.assertEqual(sum_brightness(INPUT), 17836115)
 
 unittest.main()
