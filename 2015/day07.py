@@ -46,11 +46,21 @@ def the_wire(wires, name):
             wires[name] = Wire(name)
         return wires[name]
 
-def get_wire_value(booklet, name):
+def wire_circuit(booklet):
     wires = {}
     for line in booklet.strip().split("\n"):
         parse_wire(line.split(" "), wires)
-    return wires[name].output()
+    return wires
+
+def get_wire_value(booklet, name):
+    return wire_circuit(booklet)[name].output()
+
+def part_two(booklet):
+    wires = wire_circuit(booklet)
+    a = wires['a'].output() 
+    wires = wire_circuit(booklet)
+    wires['b'].output_value = a
+    return wires['a'].output()
 
 class Item:
     
@@ -134,5 +144,7 @@ class TestExamples(unittest.TestCase):
 class TestParts(unittest.TestCase):
     def testPartOne(self):
         self.assertEqual(get_wire_value(INPUT, 'a'), 3176)
+    def testPartTwo(self):
+        self.assertEqual(part_two(INPUT), 14710)
 
 unittest.main()
