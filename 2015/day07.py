@@ -61,14 +61,8 @@ def eval_src(circuit, source):
             else eval_src(circuit, circuit[source]) if isinstance(source, str)
             else source.eval(circuit))
 
-def eval_circuit(circuit):
-    return reduce(
-        lambda a, p: _dict_plus_key(a, (p[0], eval_src(a, p[1]))),
-        circuit.items(),
-        circuit)
-
 def get_wire_value(booklet, name):
-    return eval_circuit(wire_circuit(booklet))[name]
+    return eval_src(wire_circuit(booklet), name)
 
 def part_two(booklet):
     return get_wire_value(booklet + "\n" + str(get_wire_value(booklet, 'a')) + " -> b", 'a')
