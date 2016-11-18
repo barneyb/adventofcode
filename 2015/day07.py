@@ -101,7 +101,7 @@ class Signal:
     def __init__(self, signal):
         self.signal = signal
 
-    def eval(self, sircuit):
+    def eval(self, circuit):
         return self.signal
 
     def __repr__(self):
