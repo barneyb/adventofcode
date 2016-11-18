@@ -57,13 +57,13 @@ def wire_circuit(booklet):
         {})
 
 def eval_src(circuit, source):
-    return (source if isinstance(source, int)
-            else source.signal if isinstance(source, Signal)
+    return ((circuit, source) if isinstance(source, int)
+            else (circuit, source.signal) if isinstance(source, Signal)
             else eval_src(circuit, circuit[source]) if isinstance(source, str)
             else source.eval(circuit))
 
 def get_wire_value(booklet, name):
-    return eval_src(wire_circuit(booklet), name)
+    return eval_src(wire_circuit(booklet), name)[1]
 
 def part_two(booklet):
     return get_wire_value(booklet + "\n" + str(get_wire_value(booklet, 'a')) + " -> b", 'a')
@@ -74,7 +74,8 @@ class Wire:
         self.ref = ref
 
     def eval(self, circuit):
-        return eval_src(circuit, self.ref)
+        v = eval_src(circuit, self.ref)
+        return _dict_plus_key(v[0], (self.ref, v[1])), v[1]
 
 class Signal:
 
@@ -82,7 +83,7 @@ class Signal:
         self.signal = signal
 
     def eval(self, circuit):
-        return self.signal
+        return circuit, self.signal
 
 class UnaryGate:
 
@@ -91,7 +92,8 @@ class UnaryGate:
         self.source = source
 
     def eval(self, circuit):
-        return self.op(eval_src(circuit, self.source))
+        v = eval_src(circuit, self.source)
+        return v[0], self.op(v[1])
 
 class BinaryGate:
 
@@ -101,9 +103,9 @@ class BinaryGate:
         self.right = right
 
     def eval(self, circuit):
-        return self.op(
-            eval_src(circuit, self.left),
-            eval_src(circuit, self.right))
+        l = eval_src(circuit, self.left)
+        r = eval_src(l[0], self.right)
+        return r[0], self.op(l[1], r[1])
 
 class TestExamples(unittest.TestCase):
 
@@ -134,10 +136,10 @@ class TestExamples(unittest.TestCase):
     def testI(self):
         self.assertEqual(get_wire_value(TEST_INPUT, 'i'), 65079)
 
-#class TestParts(unittest.TestCase):
-#    def testPartOne(self):
-#        self.assertEqual(get_wire_value(INPUT, 'a'), 3176)
-#    def testPartTwo(self):
-#        self.assertEqual(part_two(INPUT), 14710)
+class TestParts(unittest.TestCase):
+    def testPartOne(self):
+        self.assertEqual(get_wire_value(INPUT, 'a'), 3176)
+    def testPartTwo(self):
+        self.assertEqual(part_two(INPUT), 14710)
 
 unittest.main()
