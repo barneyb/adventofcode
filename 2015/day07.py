@@ -44,9 +44,9 @@ def the_wire(wires, name):
             wires[name] = Wire(name)
         return wires[name]
 
-def _dict_plus_key(d, pair):
-    # this "should" duplicate and modify
-    d[pair[0]] = pair[1]
+def _dict_plus_key(d, kvpair):
+    # this is my "immutably extend a dict with a new key" operator
+    d[kvpair[0]] = kvpair[1]
     return d
 
 def name_wire(w):
