@@ -46,11 +46,21 @@ def the_wire(wires, name):
             wires[name] = Wire(name)
         return wires[name]
 
+def _dict_plus_key(d, pair):
+    # this "should" duplicate and modify
+    d[pair[0]] = pair[1]
+    return d
+
+def name_wire(w):
+    return w.name, w
+
 def wire_circuit(booklet):
-    wires = {}
-    for line in booklet.strip().split("\n"):
-        parse_wire(line.split(" "), wires)
-    return wires
+    return reduce(
+        lambda a, l: _dict_plus_key(a, name_wire(parse_wire(l, a))),
+        map(
+            lambda l: l.split(" "),
+            booklet.strip().split("\n")),
+        {})
 
 def get_wire_value(booklet, name):
     return wire_circuit(booklet)[name].output()
