@@ -75,9 +75,6 @@ class Wire:
     def eval(self, circuit):
         return eval_src(circuit, self.ref)
 
-    def __repr__(self):
-        return self.ref
-
 class Signal:
 
     def __init__(self, signal):
@@ -85,9 +82,6 @@ class Signal:
 
     def eval(self, circuit):
         return self.signal
-
-    def __repr__(self):
-        return "s(" + repr(self.signal) + ")"
 
 class UnaryGate:
 
@@ -97,9 +91,6 @@ class UnaryGate:
 
     def eval(self, circuit):
         return self.op(eval_src(circuit, self.source))
-
-    def __repr__(self):
-        return repr(self.op) + " " + repr(self.source)
 
 class BinaryGate:
 
@@ -112,9 +103,6 @@ class BinaryGate:
         return self.op(
             eval_src(circuit, self.left),
             eval_src(circuit, self.right))
-
-    def __repr__(self):
-        return repr(self.left) + " " + repr(self.op) + " " + repr(self.right)
 
 class TestExamples(unittest.TestCase):
 
