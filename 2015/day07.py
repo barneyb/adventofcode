@@ -21,19 +21,17 @@ ops = {
     'LSHIFT': op.lshift,
     'RSHIFT': op.rshift
 }
+parsers = {
+    3: lambda ps, ws: the_wire(ws, ps[0]),
+    4: lambda ps, ws: UnaryGate(ops[ps[0]], the_wire(ws, ps[1])),
+    5: lambda ps, ws: BinaryGate(
+        ops[ps[1]],
+        the_wire(ws, ps[0]),
+        the_wire(ws, ps[2]))
+}
 
 def parse_wire(parts, wires):
-    if len(parts) == 3:
-        it = the_wire(wires, parts[0])
-    elif len(parts) == 4:
-        it = UnaryGate(ops[parts[0]], the_wire(wires, parts[1]))
-    elif len(parts) == 5:
-        it = BinaryGate(
-            ops[parts[1]],
-            the_wire(wires, parts[0]),
-            the_wire(wires, parts[2]))
-    else:
-        raise Exception('what?', parts)
+    it = parsers[len(parts)](parts, wires)
     wire = the_wire(wires, parts[len(parts) - 1])
     wire.source = it
     return wire
