@@ -56,11 +56,7 @@ def get_wire_value(booklet, name):
     return wire_circuit(booklet)[name].output()
 
 def part_two(booklet):
-    wires = wire_circuit(booklet)
-    a = wires['a'].output() 
-    wires = wire_circuit(booklet)
-    wires['b'].output_value = a
-    return wires['a'].output()
+    return get_wire_value(booklet + "\n" + str(get_wire_value(booklet, 'a')) + " -> b", 'a')
 
 class Item:
     
