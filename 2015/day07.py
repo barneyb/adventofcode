@@ -38,6 +38,7 @@ def wire_or_signal(name):
 
 def _dict_plus_key(d, kvpair):
     # this is my "immutably extend a dict with a new key" operator
+    d = dict(d)
     d[kvpair[0]] = kvpair[1]
     return d
 
