@@ -34,7 +34,7 @@ def wire_or_signal(name):
     try:
         return Signal(int(name))
     except ValueError:
-        return WireRef(name)
+        return Wire(name)
 
 def _dict_plus_key(d, kvpair):
     # this is my "immutably extend a dict with a new key" operator
@@ -74,18 +74,6 @@ def part_two(booklet):
     return get_wire_value(booklet + "\n" + str(get_wire_value(booklet, 'a')) + " -> b", 'a')
 
 class Wire:
-
-    def __init__(self, name, source=None):
-        self.name = name
-        self.source = source
-
-    def eval(self, circuit):
-        return eval_src(circuit, self.source)
-
-    def __repr__(self):
-        return repr(self.source) + " -> " + name
-
-class WireRef:
 
     def __init__(self, ref):
         self.ref = ref
