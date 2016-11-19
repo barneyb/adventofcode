@@ -8,18 +8,18 @@ TEST_INPUT = """
 "\\x27"
 """
 
-def char_val(a, c):
-    if a[0]: # escaped char
-        if c is 'x':
-            return (False, a[1] - 1)
+def lit_size(lit):
+    def char_val(a, c):
+        if a[0]: # escaped char
+            if c is 'x':
+                return (False, a[1] - 1)
+            else:
+                return (False, a[1] + 1)
+        elif c == '\\':
+            return (True, a[1])
         else:
             return (False, a[1] + 1)
-    elif c == '\\':
-        return (True, a[1])
-    else:
-        return (False, a[1] + 1)
 
-def lit_size(lit):
     return len(lit), reduce(char_val,
         lit[1:len(lit) - 1], # strip quotes
         (False, 0))[1]
@@ -31,25 +31,54 @@ def part_one(lines):
             lambda l: lit_size(l),
             lines.strip().split("\n"))))
 
+def enc_size(lit):
+    return len(lit), 2 + sum(map(
+        lambda c: 2 if c == '\\' or c == '"' else 1,
+        lit))
+
+def part_two(lines):
+    return sum(map(
+        lambda s: s[1] - s[0],
+        map(
+            lambda l: enc_size(l),
+            lines.strip().split("\n"))))
+
 class TestExamples(unittest.TestCase):
 
-    def testOne(self):
+    def testOneLit(self):
         self.assertEqual(lit_size('""'), (2, 0))
 
-    def testTwo(self):
+    def testTwoLit(self):
         self.assertEqual(lit_size('"abc"'), (5, 3))
 
-    def testThree(self):
+    def testThreeLit(self):
         self.assertEqual(lit_size('"aaa\\"aaa"'), (10, 7))
 
-    def testFour(self):
+    def testFourLit(self):
         self.assertEqual(lit_size('"\\x27"'), (6, 1))
 
-    def testAll(self):
+    def testAllLit(self):
         self.assertEqual(part_one(TEST_INPUT), 12)
+
+    def testOneEnc(self):
+        self.assertEqual(enc_size('""'), (2, 6))
+
+    def testTwoEnc(self):
+        self.assertEqual(enc_size('"abc"'), (5, 9))
+
+    def testThreeEnc(self):
+        self.assertEqual(enc_size('"aaa\\"aaa"'), (10, 16))
+
+    def testFourEnc(self):
+        self.assertEqual(enc_size('"\\x27"'), (6, 11))
+
+    def testAllEnc(self):
+        self.assertEqual(part_two(TEST_INPUT), 19)
 
 class TestParts(unittest.TestCase):
     def testPartOne(self):
         self.assertEqual(part_one(INPUT), 1333)
+    def testPartTwo(self):
+        self.assertEqual(part_two(INPUT), 2046)
 
 unittest.main()
