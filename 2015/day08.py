@@ -9,6 +9,11 @@ TEST_INPUT = """
 """
 
 def lit_size(lit):
+    # char_val((bool, int), str):
+    #   (True, n), 'x' -> (False, n - 1)
+    #   (True, n), c -> (False, n + 1)
+    #   (False, n), '\\' -> (True, n)
+    #   (b, n), c -> (False, n + 1)
     def char_val(a, c):
         if a[0]: # escaped char
             if c is 'x':
