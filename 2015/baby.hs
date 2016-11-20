@@ -8,6 +8,7 @@ doubleSmallNumber x = if x > 100
 
 boomBangs xs = [if x < 10 then "BOOM!" else "BANG!" | x <- xs, odd x]
 
+length' :: [a] -> Int
 length' xs = sum [ 1 | _ <- xs ]
 
 length'' :: [a] -> Int
@@ -154,3 +155,10 @@ numLongChains = length (filter (\xs -> length xs > 15) (map collatz [1..100]))
 sqrtSums :: Int
 sqrtSums = length (takeWhile (<1000) (scanl1 (+) (map sqrt [1..]))) + 1
 
+oddSquareSum :: Integer
+--oddSquareSum = sum (takeWhile (<10000) (filter odd (map (^2) [1..])))
+--oddSquareSum = sum . takeWhile (<10000) . filter odd . map (^2) $ [1..]
+oddSquareSum =
+    let oddSquares = filter odd $ map (^2) [1..]
+        belowLimit = takeWhile (<10000) oddSquares
+    in  sum belowLimit
