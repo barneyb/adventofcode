@@ -15,12 +15,16 @@ NOT y -> i
 """
 
 ops = {
+    # int -> int
     'NOT': lambda n: 65536 + ~n,
+    # int -> int -> int
     'AND': op.and_,
     'OR': op.or_,
     'LSHIFT': op.lshift,
     'RSHIFT': op.rshift
 }
+
+# str[] -> item
 parsers = {
     1: lambda ps: wire_or_signal(ps[0]),
     2: lambda ps: UnaryGate(ops[ps[0]], wire_or_signal(ps[1])),
@@ -30,24 +34,29 @@ parsers = {
         wire_or_signal(ps[2]))
 }
 
+# str -> item
 def wire_or_signal(name):
     try:
         return Signal(int(name))
     except ValueError:
         return Wire(name)
 
+# Hashable a => dict[a,b] -> (a, b) -> dict
 def _dict_plus_key(d, kvpair):
     # this is my "immutably extend a dict with a new key" operator
     d = dict(d)
     d[kvpair[0]] = kvpair[1]
     return d
 
+# str[] -> item
 def parse_src(src):
     return parsers[len(src)](src)
 
+# str[] -> (str, item)
 def parse_wire(parts):
     return parts[len(parts) - 1], parse_src(parts[:len(parts) - 2])
 
+# str -> dict[str,item]
 def wire_circuit(booklet):
     return reduce(
         lambda a, l: _dict_plus_key(a, parse_wire(l)),
@@ -56,15 +65,18 @@ def wire_circuit(booklet):
             booklet.strip().split("\n")),
         {})
 
+# dict[str,item] -> str -> int
 def eval_src(circuit, source):
     return ((circuit, source) if isinstance(source, int)
             else (circuit, source.signal) if isinstance(source, Signal)
             else eval_src(circuit, circuit[source]) if isinstance(source, str)
             else source.eval(circuit))
 
+# str -> int
 def get_wire_value(booklet, name):
     return eval_src(wire_circuit(booklet), name)[1]
 
+# str -> int
 def part_two(booklet):
     return get_wire_value(booklet + "\n" + str(get_wire_value(booklet, 'a')) + " -> b", 'a')
 

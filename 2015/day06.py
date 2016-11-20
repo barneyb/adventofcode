@@ -2,21 +2,26 @@ import unittest
 
 INPUT = open("day06_input.txt").read().strip()
 
+# str -> complex
 def parse_pair(pair):
     return complex(pair.replace(",", "+") + 'j')
 
+# str[] -> str[]
 def clean_ins(parts):
     return parts[1:] if parts[0] == "turn" else parts
 
+# str -> str[]
 def parse_ins(ins):
     parts = clean_ins(ins.split(" "))
     return parts[0], parse_pair(parts[1]), parse_pair(parts[3])
 
+# str -> str[][]
 def parse_ins_list(ins_list):
     return map(parse_ins, filter(
         lambda l: len(l.strip()) > 0,
         ins_list.split("\n")))
 
+# str[] -> complex[]
 def get_range(ins):
     return reduce(
         lambda r, i: r + i,
@@ -27,9 +32,11 @@ def get_range(ins):
             xrange(int(ins[1].real), int(ins[2].real) + 1)),
         [])
 
+# complex[] -> complex[] -> complex[]
 def get_outside(base, target):
     return base - target
 
+# complex[] -> complex[] -> complex[]
 instructions_one = {
     'on': lambda lit, ins_range: lit | ins_range,
     'off': get_outside,
@@ -40,30 +47,37 @@ instructions_one = {
             ins_range))) | get_outside(lit, ins_range)
 }
 
+# complex[] -> str[] -> complex[]
 def do_ins(lit, ins):
     return instructions_one[ins[0]](lit, frozenset(get_range(ins)))
 
+# str -> int
 def count_lit(ins_list):
     return len(reduce(do_ins, parse_ins_list(ins_list), frozenset()))
 
+# complex[] -> complex[] -> complex[]
 def do_sum_on(grid, ins_range):
     for c in ins_range:
         grid[c] = grid.get(c, 0) + 1
     return grid
 
+# complex[] -> complex[] -> complex[]
 def do_sum_off(grid, ins_range):
     for c in ins_range:
         grid[c] = max(0, grid.get(c, 0) - 1)
     return grid
 
+# complex[] -> complex[] -> complex[]
 def do_sum_toggle(grid, ins_range):
     for c in ins_range:
         grid[c] = grid.get(c, 0) + 2
     return grid
 
+# complex[] -> str[] -> complex[]
 def do_sum(grid, ins):
     return (do_sum_on if ins[0] == 'on' else do_sum_off if ins[0] == 'off' else do_sum_toggle)(grid, get_range(ins))
 
+# str -> int
 def sum_brightness(ins_list):
     return sum(reduce(do_sum, parse_ins_list(ins_list), dict()).values())
 

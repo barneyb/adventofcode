@@ -4,9 +4,11 @@ from itertools import count, takewhile
 
 INPUT = "ckczppom"
 
+# str -> str
 def md5(string):
     return hashlib.md5(string).hexdigest()
 
+# str -> str -> int
 def first_coin(key, prefix="00000"):
     return 1 + max(takewhile(
         lambda n: not md5(key + str(n)).startswith(prefix),

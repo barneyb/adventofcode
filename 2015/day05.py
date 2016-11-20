@@ -2,9 +2,11 @@ import unittest
 
 INPUT = open("day05_input.txt").read().strip()
 
+# str -> int
 def vowel_count(s):
     return sum(map(lambda c: 1 if 'aeiou'.find(c) >= 0 else 0, list(s)))
 
+# str -> bool
 def has_double_letter(s):
     return reduce(
         lambda a, c: {
@@ -14,27 +16,33 @@ def has_double_letter(s):
         list(s),
         {'last': '', 'hit': False})['hit']
 
+# str -> str -> bool
 def has_any(s, ss):
     return any(map(lambda it: s.find(it) >= 0, ss))
 
+# str -> bool
 def is_nice(s):
     return vowel_count(s) >= 3 and has_double_letter(s) and not has_any(s, [
         'ab', 'cd', 'pq', 'xy'
     ])
 
+# str -> bool
 def has_dupe_letter_pair(s):
     return any(map(
         lambda i: s.find(s[i:i+2], i+2) >= i,
         xrange(0, len(s) - 2)))
 
+# str -> bool
 def has_split_double(s):
     return any(map(
         lambda i: s[i] == s[i + 2],
         xrange(0, len(s) - 2)))
 
+# str -> bool
 def is_nice2(s):
     return has_dupe_letter_pair(s) and has_split_double(s);
 
+# (str -> bool) -> str -> int
 def count_nice(test, text):
     return len(filter(test, text.split("\n")))
 

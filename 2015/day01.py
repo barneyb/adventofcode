@@ -3,9 +3,11 @@ sys.setrecursionlimit(8000)
 
 INPUT = open("day01_input.txt").read().strip()
 
+# char -> int
 def delta_floor(c):
     return 1 if c == "(" else -1
 
+# str -> int
 def find_floor(input):
     return delta_floor(input[0]) + (find_floor(input[1:]) if len(input) > 1 else 0)
 

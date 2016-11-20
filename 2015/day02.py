@@ -3,9 +3,11 @@ from operator import add, mul
 
 INPUT = open("day02_input.txt").read().strip()
 
+# str -> int[]
 def present_dim(spec):
     return sorted(map(int, spec.split("x")))
 
+# int[] -> int[]
 def sides(d):
     return [
         d[0] * d[1],
@@ -13,18 +15,23 @@ def sides(d):
         d[2] * d[0]
     ]
 
+# int[] -> int
 def paper_for_present(d):
     return reduce(add, map(lambda n: 2 * n, sides(d))) + min(sides(d))
 
+# int[] -> int
 def ribbon_for_present(d):
     return 2 * d[0] + 2 * d[1] + reduce(mul, d)
 
+# int[][] -> int
 def paper_for_presents(specs):
     return total_for_presents(paper_for_present, specs)
 
+# int[][] -> int
 def ribbon_for_presents(specs):
     return total_for_presents(ribbon_for_present, specs)
 
+# (int[] -> int) -> str -> int
 def total_for_presents(to_num, specs):
     return reduce(add, map(to_num, map(present_dim, specs.split("\n"))))
 

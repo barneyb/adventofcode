@@ -8,8 +8,9 @@ TEST_INPUT = """
 "\\x27"
 """
 
+# str -> int
 def lit_size(lit):
-    # char_val((bool, int), str):
+    # (bool, int) -> str -> (bool int):
     #   (True, n), 'x' -> (False, n - 1)
     #   (True, n), c -> (False, n + 1)
     #   (False, n), '\\' -> (True, n)
@@ -29,6 +30,7 @@ def lit_size(lit):
         lit[1:len(lit) - 1], # strip quotes
         (False, 0))[1]
 
+# str -> int
 def part_one(lines):
     return sum(map(
         lambda s: s[0] - s[1],
@@ -36,11 +38,13 @@ def part_one(lines):
             lambda l: lit_size(l),
             lines.strip().split("\n"))))
 
+# str -> int
 def enc_size(lit):
     return len(lit), 2 + sum(map(
         lambda c: 2 if c == '\\' or c == '"' else 1,
         lit))
 
+# str -> int
 def part_two(lines):
     return sum(map(
         lambda s: s[1] - s[0],

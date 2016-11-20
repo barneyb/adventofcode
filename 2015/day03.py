@@ -9,9 +9,11 @@ step_to_num_map = {
     '<': -1,
 }
 
+# str -> int
 def house_count(steps):
     return len(houses(steps))
 
+# str -> int
 def houses(steps):
     return reduce(
         lambda a, s: {
@@ -25,6 +27,7 @@ def houses(steps):
             'houses': set([0j])
         })['houses']
 
+# str -> int
 def house_count_robo(steps):
     return len(houses(steps[0:len(steps):2]) | houses(steps[1:len(steps):2]))
     
