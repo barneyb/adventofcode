@@ -1,6 +1,6 @@
 doubleMe x = x + x
 
-doubleUs x y = doubleMe x  + doubleMe y
+doubleUs x y = doubleMe x + doubleMe y
 
 doubleSmallNumber x = if x > 100
     then x
@@ -138,3 +138,19 @@ flip' f x y = f y x
 largestDivisible :: Integral a => a
 largestDivisible = head (filter test [100000,99999..0])
     where test n = n `mod` 3829 == 0
+
+-- for all starting numbers between 1 and 100, how many chains have a length greater than 15
+collatz :: Integral a => a-> [a]
+collatz 1 = [1]
+collatz n
+    | even n    = n : collatz (n `div` 2)
+    | odd n     = n : collatz (n * 3 + 1)
+
+numLongChains :: Int
+--numLongChains = length (filter (>15) (map length (map collatz [1..100])))
+numLongChains = length (filter (\xs -> length xs > 15) (map collatz [1..100]))
+
+-- How many elements does it take for the sum of the roots of all natural numbers to exceed 1000
+sqrtSums :: Int
+sqrtSums = length (takeWhile (<1000) (scanl1 (+) (map sqrt [1..]))) + 1
+
