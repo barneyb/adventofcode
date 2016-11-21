@@ -14,7 +14,7 @@ for i in `ls *.* | egrep '.*\.(py)$' | sort`; do
     if [ `echo $i | cut -d . -f 2` == "py" ]; then
         python $i
     else
-        ghc $i && ./`echo $i | cut -d . -f 1`
+        runghc $i
     fi
     if [ $? != 0 ]; then
         label "FAILURE!"
