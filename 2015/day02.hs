@@ -19,6 +19,13 @@ wrap b =
 wrap_order :: [Box] -> Int
 wrap_order bs = sum (map wrap bs)
 
+ribbon :: Box -> Int
+ribbon (a, b, c) = a * 2 + b * 2 + a * b * c
+
+ribbon_order :: [Box] -> Int
+ribbon_order bs = sum (map ribbon bs)
+
 main = do
     input <- readFile "day02_input.txt"
     print (wrap_order (map parse_box (lines input)))
+    print (ribbon_order (map parse_box (lines input)))
