@@ -2,8 +2,8 @@ delta :: Char -> Int
 delta '(' = 1
 delta ')' = -1
 
-find_floor :: [Char] -> Int
-find_floor cs = sum (map delta cs)
+find_floor :: String -> Int
+find_floor s = sum (map delta s)
 
 bfold :: (Int, Int, Int) -> Int -> (Int, Int, Int)
 bfold (p, c, f) d
@@ -12,9 +12,9 @@ bfold (p, c, f) d
     | otherwise = (-1, c + 1, n)
     where n = f + d
 
-bpos :: [Char] -> Int
-bpos cs =
-    let (r, _, _) = foldl bfold (-1, 0, 0) (map delta cs)
+bpos :: String -> Int
+bpos s =
+    let (r, _, _) = foldl bfold (-1, 0, 0) (map delta s)
     in r
 
 main = do
