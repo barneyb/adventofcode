@@ -1,3 +1,4 @@
+import Control.Exception (assert)
 import qualified Data.List as L
 import qualified Data.List.Split as S
 
@@ -27,5 +28,5 @@ ribbon_order bs = sum (map ribbon bs)
 
 main = do
     input <- readFile "day02_input.txt"
-    print (wrap_order (map parse_box (lines input)))
-    print (ribbon_order (map parse_box (lines input)))
+    print $ assert (1586300 == (wrap_order (map parse_box (lines input)))) "part one passed"
+    print $ assert (3737498 == (ribbon_order (map parse_box (lines input)))) "part two passed"
