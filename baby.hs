@@ -1,3 +1,6 @@
+main = do
+    print "baby is for loading into GHCi"
+
 doubleMe x = x + x
 
 doubleUs x y = doubleMe x + doubleMe y
