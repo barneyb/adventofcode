@@ -1,3 +1,5 @@
+import Control.Exception (assert)
+
 delta :: Char -> Int
 delta '(' = 1
 delta ')' = -1
@@ -5,7 +7,9 @@ delta ')' = -1
 find_floor :: String -> Int
 find_floor s = sum (map delta s)
 
-bfold :: (Int, Int, Int) -> Int -> (Int, Int, Int)
+type PosCountFloor = (Int, Int, Int)
+
+bfold :: PosCountFloor -> Int -> PosCountFloor
 bfold (p, c, f) d
     | p >= 0    = (p, 0, 0)
     | n < 0     = (c + 1, 0, 0)
@@ -19,5 +23,5 @@ bpos s =
 
 main = do
     input <- readFile "day01_input.txt"
-    print (find_floor input)
-    print (bpos input)
+    print $ assert (232 == (find_floor input)) "part one passed!"
+    print $ assert (1783 == (bpos input)) "part two passed!"
