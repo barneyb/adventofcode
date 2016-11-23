@@ -14,15 +14,16 @@ to_dir '>' = ( 1,  0)
 to_dir 'v' = ( 0, -1)
 
 house_set :: String -> Set.Set Pos
-house_set input = Set.fromList (scanl move (0, 0) (map to_dir input))
+house_set input = Set.fromList $ scanl move (0, 0) (map to_dir input)
 
 house_count :: String -> Int
 house_count = Set.size . house_set
 
 every_second :: [a] -> [a]
-every_second (x:y:xs) = x : every_second xs
-every_second (x:[]) = []
-every_second [] = []
+every_second xs = map fst $ filter (odd . snd) (zip xs [1..])
+--every_second (x:y:xs) = x : every_second xs
+--every_second (x:[]) = []
+--every_second [] = []
 
 robo_house_count :: String -> Int
 robo_house_count input = Set.size $ Set.union (house_set (every_second input)) (house_set (every_second (tail input)))
