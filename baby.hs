@@ -1,5 +1,4 @@
-main = do
-    print "baby is for loading into GHCi"
+import qualified Data.Map.Strict as Map
 
 doubleMe x = x + x
 
@@ -165,3 +164,15 @@ oddSquareSum =
     let oddSquares = filter odd $ map (^2) [1..]
         belowLimit = takeWhile (<10000) oddSquares
     in  sum belowLimit
+
+fib :: Int -> Int
+fib 1 = 1
+fib 2 = 1
+fib n = fib (n - 1) + fib (n - 2)
+
+mfib :: Int -> Int
+mfib = (map fib [0..] !!)
+    where
+        fib 0 = 1
+        fib 1 = 1
+        fib n = mfib (n - 1) + mfib (n - 2)
