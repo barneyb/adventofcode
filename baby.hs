@@ -173,6 +173,6 @@ fib n = fib (n - 1) + fib (n - 2)
 mfib :: Int -> Int
 mfib = (map fib [0..] !!)
     where
-        fib 0 = 1
         fib 1 = 1
+        fib 2 = 1
         fib n = mfib (n - 1) + mfib (n - 2)
