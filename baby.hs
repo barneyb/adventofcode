@@ -176,3 +176,9 @@ mfib = (map fib [0..] !!)
         fib 1 = 1
         fib 2 = 1
         fib n = mfib (n - 1) + mfib (n - 2)
+
+mfib' :: Int -> Int
+mfib' n =
+    let
+        fib = 1 : 1 : [ a+b | (a,b) <- zip fib (tail fib) ]
+    in  fib !! (n - 1) -- zero indexed!
