@@ -4,7 +4,7 @@ data Turn = L | R deriving (Eq, Show)
 
 data Heading = N | E | S | W deriving (Eq, Enum, Show)
 
-type Point = (Heading, Int, Int)
+type Position = (Heading, Int, Int)
 
 type Step = (Turn, Int)
 
@@ -32,7 +32,7 @@ delta E n = (n, 0)
 delta S n = (0, -n)
 delta W n = (-n, 0)
 
-walk :: Point -> Step -> Point
+walk :: Position -> Step -> Position
 walk (h, x, y) (t, n) =
     let
         h_ = turn h t
