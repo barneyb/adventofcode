@@ -32,16 +32,15 @@ delta E n = (n, 0)
 delta S n = (0, -n)
 delta W n = (-n, 0)
 
-walk :: Position -> Step -> Position
-walk (h, x, y) (t, n) =
-    let
-        h_ = turn h t
-        (dx, dy) = delta h_ n
-    in (h_, x + dx, y + dy)
-
 part_one :: String -> Int
 part_one input =
     let
+        walk :: Position -> Step -> Position
+        walk (h, x, y) (t, n) =
+            let
+                h_ = turn h t
+                (dx, dy) = delta h_ n
+            in (h_, x + dx, y + dy)
         (h, x, y) = foldl walk (N, 0, 0) (steps input)
     in (abs x) + (abs y)
 
