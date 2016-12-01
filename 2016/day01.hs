@@ -43,8 +43,11 @@ part_one :: String -> Int
 part_one input =
     let
         (h, x, y) = foldl walk (N, 0, 0) (steps input)
-    in x + y
+    in (abs x) + (abs y)
 
 main = do
     input <- readFile "day01_input.txt"
-    print $ assert (82 == (part_one input)) "part one passed!"
+    print $ assert (5 == (part_one "R2, L3")) "test one passed!"
+    print $ assert (2 == (part_one "R2, R2, R2")) "test two passed!"
+    print $ assert (12 == (part_one "R5, L5, R5, R3")) "test three passed!"
+    print $ assert (288 == (part_one input)) "part one passed!"
