@@ -10,12 +10,15 @@ type Step = (Turn, Int)
 
 type Delta = (Int, Int)
 
-parse :: String -> Step
-parse s = p c
+steps :: String -> [Step]
+steps input = map parse (words input)
     where
-        p ('L':ds) = (L, read ds)
-        p ('R':ds) = (R, read ds)
-        c = if (last s) == ',' then (init s) else s
+        parse :: String -> Step
+        parse s = p c
+            where
+                p ('L':ds) = (L, read ds)
+                p ('R':ds) = (R, read ds)
+                c = if (last s) == ',' then (init s) else s
 
 turn :: Heading -> Turn -> Heading
 turn N L = W
@@ -39,10 +42,9 @@ walk (h, x, y) (t, n) =
 part_one :: String -> Int
 part_one input =
     let
-        (h, x, y) = foldl walk (N, 0, 0) (map parse (words input))
+        (h, x, y) = foldl walk (N, 0, 0) (steps input)
     in x + y
 
 main = do
     input <- readFile "day01_input.txt"
-    print $ assert ((R, 1) == parse "R1") ""
     print $ assert (82 == (part_one input)) "part one passed!"
