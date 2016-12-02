@@ -32,6 +32,15 @@ delta E n = (n, 0)
 delta S n = (0, -n)
 delta W n = (-n, 0)
 
+start :: Position
+start = (N, 0, 0)
+
+dist :: Position -> Position -> Int
+dist (_, x1, y1) (_, x2, y2) = (abs x2 - x1) + (abs y2 - y1)
+
+distFromStart :: Position -> Int
+distFromStart = dist start
+
 part_one :: String -> Int
 part_one input =
     let
@@ -41,8 +50,7 @@ part_one input =
                 h_ = turn h t
                 (dx, dy) = delta h_ n
             in (h_, x + dx, y + dy)
-        (h, x, y) = foldl walk (N, 0, 0) (steps input)
-    in (abs x) + (abs y)
+    in distFromStart $ foldl walk start (steps input)
 
 main = do
     input <- readFile "day01_input.txt"
