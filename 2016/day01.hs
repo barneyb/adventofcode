@@ -4,7 +4,13 @@ data Turn = L | R deriving (Eq, Show)
 
 data Heading = N | E | S | W deriving (Eq, Enum, Show)
 
-type Position = (Heading, Int, Int)
+data Position = Pos Heading Int Int
+
+instance Eq Position where
+    (Pos _ x1 y1) == (Pos _ x2 y2) = x1 == x2 && y1 == y2
+
+instance Show Position where
+    show (Pos h x y) = "(" ++ show h ++ ", " ++ show x ++ ", " ++ show y ++ ")"
 
 type Step = (Turn, Int)
 
@@ -33,24 +39,44 @@ delta S n = (0, -n)
 delta W n = (-n, 0)
 
 start :: Position
-start = (N, 0, 0)
+start = Pos N 0 0
 
 dist :: Position -> Position -> Int
-dist (_, x1, y1) (_, x2, y2) = (abs x2 - x1) + (abs y2 - y1)
+dist (Pos _ x1 y1) (Pos _ x2 y2) = (abs x2 - x1) + (abs y2 - y1)
 
 distFromStart :: Position -> Int
 distFromStart = dist start
 
-part_one :: String -> Int
-part_one input =
+walk :: Position -> Step -> Position
+walk (Pos h x y) (t, n) =
     let
-        walk :: Position -> Step -> Position
-        walk (h, x, y) (t, n) =
-            let
-                h_ = turn h t
-                (dx, dy) = delta h_ n
-            in (h_, x + dx, y + dy)
-    in distFromStart $ foldl walk start (steps input)
+        h_ = turn h t
+        (dx, dy) = delta h_ n
+    in Pos h_ (x + dx) (y + dy)
+
+part_one :: String -> Int
+part_one input = distFromStart $ foldl walk start (steps input)
+
+expand_steps :: (Position, Position) -> [Position]
+expand_steps (Pos _ x1 y1, Pos h x2 y2) = case h of
+    N -> [ Pos h x1 y | y <- [(y1+1)..y2] ]
+    E -> [ Pos h x y1 | x <- [(x1+1)..x2] ]
+    S -> [ Pos h x1 y | y <- [(y1-1),(y1-2)..y2] ]
+    W -> [ Pos h x y1 | x <- [(x1-1),(x1-2)..x2] ]
+
+part_two :: String -> Int
+part_two input =
+    let
+        ps = scanl walk start (steps input)
+        pps = zip ps (tail ps)
+        exps = map expand_steps pps
+        locs = foldl (\a v -> a ++ v) [start] exps
+        findDupes :: [Position] -> [(Bool, Position)]
+        findDupes [] = []
+        findDupes (p:ps) = (p `elem` ps, p):(findDupes ps)
+        ds = dropWhile (\x -> not (fst x)) (findDupes locs)
+        (_, d) = head ds
+    in distFromStart d
 
 main = do
     input <- readFile "day01_input.txt"
@@ -58,3 +84,5 @@ main = do
     print $ assert (2 == (part_one "R2, R2, R2")) "test two passed!"
     print $ assert (12 == (part_one "R5, L5, R5, R3")) "test three passed!"
     print $ assert (288 == (part_one input)) "part one passed!"
+    print $ assert (4 == (part_two "R8, R4, R4, R8, L200")) "test four passed!"
+    print $ assert (111 == (part_two input)) "part two passed!"
