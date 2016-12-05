@@ -1,6 +1,6 @@
 import Control.Exception (assert)
 
-data Move = L | R | D | U deriving (Eq, Show)
+data Move = L | R | D | U deriving (Eq, Show, Enum)
 
 type Button = Char
 
@@ -34,13 +34,8 @@ move1 c _ = c
     D
 -}
 move2 :: Button -> Move -> Button
-move2 c d = (moves c) !! (idx d)
+move2 c m = (moves c) !! (fromEnum m)
     where
-        idx :: Move -> Int
-        idx L = 0
-        idx R = 1
-        idx D = 2
-        idx U = 3
         moves :: Button -> [Button]
                   --  L    R    D    U
         moves '1' = ['1', '1', '3', '1']
