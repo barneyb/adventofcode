@@ -11,8 +11,7 @@ parse input = map ((\[a, b, c] -> (a, b, c)) . parse_line) (lines input)
 
 test :: Triangle -> Bool
 test (a, b, c) =
-    let l = L.sort [a, b, c]
-        [a', b', c'] = l
+    let [a', b', c'] = L.sort [a, b, c]
     in a' + b' > c'
 
 tri_count :: [Triangle] -> Int
