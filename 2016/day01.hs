@@ -50,9 +50,9 @@ distFromStart = dist start
 walk :: Position -> Step -> Position
 walk (Pos h x y) (t, n) =
     let
-        h_ = turn h t
-        (dx, dy) = delta h_ n
-    in Pos h_ (x + dx) (y + dy)
+        h' = turn h t
+        (dx, dy) = delta h' n
+    in Pos h' (x + dx) (y + dy)
 
 part_one :: String -> Int
 part_one input = distFromStart $ foldl walk start (steps input)
