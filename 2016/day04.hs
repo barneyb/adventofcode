@@ -34,6 +34,16 @@ is_real r = checksum r == (chksum $ encname r)
 part_one :: String -> Int
 part_one input = foldl (\s r -> s + (sector r)) 0 (filter is_real (parse_rooms input))
 
+decrypt :: Int -> Char -> Char
+decrypt s '-' = ' '
+decrypt s c = head $ drop (mod s 26) ([c..'z'] ++ ['a'..(pred c)])
+
+name :: Room -> String
+name r = map (decrypt (sector r)) (encname r)
+
+part_two :: String -> Int
+part_two input = sector $ head (filter (\r -> (is_real r) && (name r) == "northpole object storage") (parse_rooms input))
+
 test_input = "aaaaa-bbb-z-y-x-123[abxyz]\n\
              \a-b-c-d-e-f-g-h-987[abcde]\n\
              \not-a-real-room-404[oarel]\n\
@@ -45,3 +55,6 @@ main = do
     foldl1 (>>) (map (\s -> print (is_real $ parse_room s)) (lines test_input))
     print $ assert (1514 == (part_one test_input)) "test one passed!"
     print $ assert (361724 == (part_one input)) "part one passed!"
+    print $ assert ("very encrypted name" == (name Room{encname="qzmt-zixmtkozy-ivhz", sector=343, checksum=""})) "test two passed!"
+    print $ assert (482 == part_two input) "part two passed!"
+
