@@ -11,4 +11,4 @@ main = do
     print (part_one input)
     print $ assert (0 == (part_one input)) "part one passed!"
 --    print (part_two input)
---    print $ assert (0 == (part_two input)) "part one passed!"
+--    print $ assert (0 == (part_two input)) "part two passed!"
