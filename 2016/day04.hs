@@ -2,6 +2,7 @@ import Control.Exception (assert)
 import Text.Regex.TDFA
 import qualified Data.Map.Strict as M
 import qualified Data.List as L
+import Utils
 
 data Room = Room {
     encname  :: String,
@@ -24,9 +25,6 @@ chksum :: String -> String
 chksum s =
     let h = M.toList $ hist $ filter (/= '-') s
     in take 5 $ map fst  $L.sortBy (\b a -> compare (snd a) (snd b)) h
-
-hist :: Ord a => [a] -> M.Map a Int
-hist = foldl (\m c -> M.insertWith (+) c 1 m) (M.empty)
 
 is_real :: Room -> Bool
 is_real r = checksum r == (chksum $ encname r)

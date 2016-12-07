@@ -1,14 +1,5 @@
 import Control.Exception (assert)
-import Crypto.Hash
-import qualified Data.ByteString.Char8 as C
-
--- taken from 2015's day 4
-md5 :: String -> String
-md5 s = show (hash (C.pack s) :: Digest MD5)
-
--- taken from 2015's day 4 (and renamed from chash)
-nhash :: String -> Int -> String
-nhash key n = md5 (key ++ (show n))
+import Utils
 
 candidates :: String -> [String]
 candidates key = filter (\ h -> "00000" == (take 5 h)) (map (nhash key) [0..])
