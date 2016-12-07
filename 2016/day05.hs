@@ -10,11 +10,12 @@ md5 s = show (hash (C.pack s) :: Digest MD5)
 nhash :: String -> Int -> String
 nhash key n = md5 (key ++ (show n))
 
+candidates :: String -> [String]
+candidates key = filter (\ h -> "00000" == (take 5 h)) (map (nhash key) [0..])
+
 pass :: Int -> String -> String
 pass len key =
-    let hs = map (nhash key) [0..]
-        chs = filter (\ h -> "00000" == (take 5 h)) hs
-        cs = map (!! 5) chs
+    let cs = map (!! 5) (candidates key)
     in take len cs
 
 part_one :: String -> String
