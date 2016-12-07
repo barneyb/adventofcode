@@ -4,7 +4,7 @@ import qualified Data.Map.Strict as M
 import qualified Data.List as L
 
 data Room = Room {
-    name     :: String,
+    encname  :: String,
     sector   :: Int,
     checksum :: String
 } deriving (Eq, Show)
@@ -15,7 +15,7 @@ room_regex = "([a-z-]+)-([0-9]+)\\[([a-z]{5})\\]"
 parse_room :: String -> Room
 parse_room s =
     let (_, _, _, ps) = s =~ room_regex :: (String,String,String,[String])
-    in  Room{name=ps !! 0, sector=read (ps !! 1), checksum=ps !! 2}
+    in  Room{encname=ps !! 0, sector=read (ps !! 1), checksum=ps !! 2}
 
 parse_rooms :: String -> [Room]
 parse_rooms input = map parse_room (lines input)
@@ -29,7 +29,7 @@ hist :: Ord a => [a] -> M.Map a Int
 hist = foldl (\m c -> M.insertWith (+) c 1 m) (M.empty)
 
 is_real :: Room -> Bool
-is_real r = checksum r == (chksum $ name r)
+is_real r = checksum r == (chksum $ encname r)
 
 part_one :: String -> Int
 part_one input = foldl (\s r -> s + (sector r)) 0 (filter is_real (parse_rooms input))
