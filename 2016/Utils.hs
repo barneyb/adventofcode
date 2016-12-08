@@ -28,10 +28,12 @@ freq xs =
 
 -- python-style reduce which just delegates to foldl
 reduce :: (a -> x -> a) -> [x] -> a -> a
+-- reduce(function(a, x):a, x[], a):a
 reduce func list agg = foldl func agg list
 
 -- python-style scan (which it doesn't actually have) which is implemented via reduce
 scan :: (a -> x -> a) -> [x] -> a -> [a]
+-- scan(function(a, x):a, x[], a):[a]
 scan func list agg =
     let
         lambda (a, as) x =
