@@ -37,8 +37,24 @@ tls ip = (any abba (nets ip)) && (not (any abba (hypernets ip)))
 part_one :: String -> Int
 part_one input = length $ filter tls (map parse (lines input))
 
---part_two :: String -> Int
---part_two input = length input
+abas :: String -> [String]
+abas [] = []
+abas [_] = []
+abas [_, _] = []
+abas (x:y:x':xs)
+    | x /= y && x == x' = [x, y, x]:(abas (y:x':xs))
+    | otherwise         = abas(y:x':xs)
+
+aba2bab :: String -> String
+aba2bab [x, y, _] = [y, x, y]
+
+ssl :: IP -> Bool
+ssl ip =
+    let babs = map aba2bab (concat (map abas (nets ip)))
+    in any (\bab -> any (L.isInfixOf bab) (hypernets ip)) babs
+
+part_two :: String -> Int
+part_two input = length $ filter ssl (map parse (lines input))
 
 test_strings = [
     "abba[mnop]qrst",
@@ -83,6 +99,10 @@ main = do
     let r = part_one input
     print r
     print $ assert (110 == r) "part one passed!"
---    let r = part_two input
---    print r
---    print $ assert (0 == r) "part two passed!"
+    print $ assert (ssl (parse "aba[bab]xyz")) "test one passed"
+    print $ assert (not $ ssl (parse "xyx[xyx]xyx")) "test two passed"
+    print $ assert (ssl (parse "aaa[kek]eke")) "test three passed"
+    print $ assert (ssl (parse "zazbz[bzb]cdb")) "test four passed"
+    let r = part_two input
+    print r
+    print $ assert (242 == r) "part two passed!"
