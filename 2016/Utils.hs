@@ -35,9 +35,8 @@ reduce func list agg = foldl func agg list
 scan :: (a -> x -> a) -> [x] -> a -> [a]
 -- scan(function(a, x):a, x[], a):[a]
 scan func list agg =
-    let
-        lambda (a, as) x =
+    let (_, values) = reduce work list (agg, [agg])
+        work (a, as) x =
             let a' = func a x
             in (a', as ++ [a'])
-        (final, path) = reduce lambda list (agg, [agg])
-    in path
+    in values
