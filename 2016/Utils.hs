@@ -25,3 +25,17 @@ freq :: Ord a => [a] -> [(a, Int)]
 freq xs =
     let h = M.toList $ hist xs
     in L.sortBy (\b a -> compare (snd a) (snd b)) h
+
+-- python-style reduce which just delegates to foldl
+reduce :: (a -> x -> a) -> [x] -> a -> a
+reduce func list agg = foldl func agg list
+
+-- python-style scan (which it doesn't actually have) which is implemented via reduce
+scan :: (a -> x -> a) -> [x] -> a -> [a]
+scan func list agg =
+    let
+        lambda (a, as) x =
+            let a' = func a x
+            in (a', as ++ [a'])
+        (final, path) = reduce lambda list (agg, [agg])
+    in path
