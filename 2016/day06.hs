@@ -6,8 +6,8 @@ import Utils
 part_one :: String -> String
 part_one input = map (fst . head . freq) (L.transpose (lines input))
 
---part_two :: String -> String
---part_two input = show $ length input
+part_two :: String -> String
+part_two input = map (fst . last . freq) (L.transpose (lines input))
 
 test_input = "eedadn\n\
              \drvtee\n\
@@ -30,10 +30,13 @@ main = do
     input <- readFile "day06_input.txt"
     let r = part_one test_input
     print r
-    print $ assert ("easter" == r) "part one passed!"
+    print $ assert ("easter" == r) "test one passed!"
     let r = part_one input
     print r
     print $ assert ("qtbjqiuq" == r) "part one passed!"
---    let r = part_two input
---    print r
---    print $ assert ("" == r) "part two passed!"
+    let r = part_two test_input
+    print r
+    print $ assert ("advent" == r) "testtwo passed!"
+    let r = part_two input
+    print r
+    print $ assert ("akothqli" == r) "part two passed!"
