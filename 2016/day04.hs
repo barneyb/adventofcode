@@ -24,7 +24,7 @@ parse_rooms input = map parse_room (lines input)
 chksum :: String -> String
 chksum s =
     let h = M.toList $ hist $ filter (/= '-') s
-    in take 5 $ map fst  $L.sortBy (\b a -> compare (snd a) (snd b)) h
+    in take 5 $ map fst $ L.sortBy (\b a -> compare (snd a) (snd b)) h
 
 is_real :: Room -> Bool
 is_real r = checksum r == (chksum $ encname r)
