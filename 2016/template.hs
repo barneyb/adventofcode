@@ -8,7 +8,9 @@ part_one input = length input
 
 main = do
     input <- readFile "day_input.txt"
-    print (part_one input)
-    print $ assert (0 == (part_one input)) "part one passed!"
---    print (part_two input)
---    print $ assert (0 == (part_two input)) "part two passed!"
+    let r = part_one input
+    print r
+    print $ assert (0 == r) "part one passed!"
+--    let r = part_two input
+--    print r
+--    print $ assert (0 == r) "part two passed!"
