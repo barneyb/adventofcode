@@ -75,4 +75,4 @@ main = do
     print $ assert ("1985" == (part_one test_input)) "test one passed!"
     print $ assert ("61529" == (part_one input)) "part one passed!"
     print $ assert ("5DB3" == (part_two test_input)) "test two passed!"
-    print $ assert ("C2C28" == (part_two input)) "test two passed!"
+    print $ assert ("C2C28" == (part_two input)) "part two passed!"
