@@ -3,6 +3,7 @@ module Utils
 , hist
 , md5
 , nhash
+, prints
 , update
 ) where
 
@@ -30,6 +31,9 @@ freq xs =
 -- a la the one for Seq
 update :: Int -> a -> [a] -> [a]
 update i x xs = take i xs ++ (x : drop (i + 1) xs)
+
+prints :: Show a => [a] -> IO ()
+prints xs = foldl1 (>>) $ map print xs
 
 -- python-style reduce which just delegates to foldl
 reduce :: (a -> x -> a) -> [x] -> a -> a
