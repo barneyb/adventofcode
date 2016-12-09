@@ -6,9 +6,11 @@ data Cmd = Rect Int Int | Row Int Int | Col Int Int
 
 type Point = (Int, Int)
 
+type Pixel = (Point, Bool)
+
 type Display = Array Point Bool
 
-box :: Int -> Int -> Bool -> [(Point, Bool)]
+box :: Int -> Int -> Bool -> [Pixel]
 box w h v = [ ((x, y), v) | x <- [1..w], y <- [1..h] ]
 
 build :: Int -> Int -> Display
