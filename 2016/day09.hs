@@ -3,26 +3,26 @@ import qualified Data.Char as C
 import Text.Regex.TDFA
 import Utils
 
-parts :: String -> (String, String, String)
-parts s =
-    let (prefix, _, suffix, ps) = s =~ "\\(([0-9]+)x([0-9]+)\\)" :: (String, String, String, [String])
-        ns = map read ps
-        hs = splitAt (ns !! 0) suffix
-        mid = concat $ take (ns !! 1) $ repeat (fst hs)
-    in (prefix, mid, (snd hs))
+regex :: String
+regex = "\\(([0-9]+)x([0-9]+)\\)"
 
 parse :: String -> String
 parse str
     | '(' `elem` str  =
-        let (p, m, s) = parts str
-        in p ++ m ++ (parse s)
+        let (prefix, _, suffix, ps) = str =~ regex :: (String, String, String, [String])
+            ns = map read ps
+            hs = splitAt (ns !! 0) suffix
+            mid = concat $ take (ns !! 1) $ repeat (fst hs)
+        in prefix ++ mid ++ (parse (snd hs))
     | otherwise       = str
 
 countR :: String -> Int
 countR str
     | '(' `elem` str =
-        let (p, m, s) = parts str
-        in (length p) + (countR (m ++ s))
+        let (prefix, _, suffix, ps) = str =~ regex :: (String, String, String, [String])
+            ns = map read ps
+            hs = splitAt (ns !! 0) suffix
+        in (length prefix) + (ns !! 1) * (countR (fst hs)) + (countR (snd hs))
     | otherwise      = length str
 
 no_spaces :: String -> String
@@ -85,6 +85,6 @@ main = do
     print r
     print $ assert (183269 == r) "part one passed!"
 
---    let r = part_two input
---    print r
---    print $ assert (0 == r) "part two passed!"
+    let r = part_two input
+    print r
+    print $ assert (11317278863 == r) "part two passed!"
