@@ -4,6 +4,7 @@ module Utils
 , md5
 , nhash
 , prints
+, regexgrps
 , update
 ) where
 
@@ -11,6 +12,7 @@ import Crypto.Hash
 import qualified Data.ByteString.Char8 as C
 import qualified Data.Map.Strict as M
 import qualified Data.List as L
+import Text.Regex.TDFA
 
 -- taken from 2015's day 4
 md5 :: String -> String
@@ -34,6 +36,11 @@ update i x xs = take i xs ++ (x : drop (i + 1) xs)
 
 prints :: Show a => [a] -> IO ()
 prints xs = foldl1 (>>) $ map print xs
+
+regexgrps :: String -> String -> [String]
+regexgrps str regex =
+    let (_, _, _, ps) = str =~ regex :: (String,String,String,[String])
+    in ps
 
 -- python-style reduce which just delegates to foldl
 reduce :: (a -> x -> a) -> [x] -> a -> a

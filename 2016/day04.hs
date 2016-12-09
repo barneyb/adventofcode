@@ -1,5 +1,4 @@
 import Control.Exception (assert)
-import Text.Regex.TDFA
 import qualified Data.Map.Strict as M
 import qualified Data.List as L
 import Utils
@@ -15,7 +14,7 @@ room_regex = "([a-z-]+)-([0-9]+)\\[([a-z]{5})\\]"
 
 parse_room :: String -> Room
 parse_room s =
-    let (_, _, _, ps) = s =~ room_regex :: (String,String,String,[String])
+    let ps = regexgrps s room_regex
     in  Room{encname=ps !! 0, sector=read (ps !! 1), checksum=ps !! 2}
 
 parse_rooms :: String -> [Room]
