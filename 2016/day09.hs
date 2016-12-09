@@ -6,23 +6,26 @@ import Utils
 regex :: String
 regex = "\\(([0-9]+)x([0-9]+)\\)"
 
+parts :: String -> (String, Int, String, String)
+parts str =
+    let (prefix, _, suffix, ps) = str =~ regex :: (String, String, String, [String])
+        ns = map read ps
+        hs = splitAt (ns !! 0) suffix
+    in (prefix, ns !! 1, fst hs, snd hs)
+
 parse :: String -> String
 parse str
     | '(' `elem` str  =
-        let (prefix, _, suffix, ps) = str =~ regex :: (String, String, String, [String])
-            ns = map read ps
-            hs = splitAt (ns !! 0) suffix
-            mid = concat $ take (ns !! 1) $ repeat (fst hs)
-        in prefix ++ mid ++ (parse (snd hs))
+        let (prefix, n, rep, suffix) = parts str
+            mid = concat $ take n $ repeat rep
+        in prefix ++ mid ++ (parse suffix)
     | otherwise       = str
 
 countR :: String -> Int
 countR str
     | '(' `elem` str =
-        let (prefix, _, suffix, ps) = str =~ regex :: (String, String, String, [String])
-            ns = map read ps
-            hs = splitAt (ns !! 0) suffix
-        in (length prefix) + (ns !! 1) * (countR (fst hs)) + (countR (snd hs))
+        let (prefix, n, rep, suffix) = parts str
+        in (length prefix) + n * (countR rep) + (countR suffix)
     | otherwise      = length str
 
 no_spaces :: String -> String
