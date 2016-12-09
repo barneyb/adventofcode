@@ -8,11 +8,14 @@ type Point = (Int, Int)
 
 type Display = Array Point Bool
 
+box :: Int -> Int -> Bool -> [(Point, Bool)]
+box w h v = [ ((x, y), v) | x <- [1..w], y <- [1..h] ]
+
 build :: Int -> Int -> Display
-build w h = array ((1, 1), (w, h)) [ ((x, y), False) | x <- [1..w], y <- [1..h] ]
+build w h = array ( (1, 1), (w, h) ) (box w h False)
 
 execute :: Display -> Cmd -> Display
-execute d c = d
+execute d (Rect w h) = d//(box w h True)
 
 parse :: String -> Cmd
 parse s = Rect 1 1
