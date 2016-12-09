@@ -3,6 +3,7 @@ module Utils
 , hist
 , md5
 , nhash
+, update
 ) where
 
 import Crypto.Hash
@@ -25,6 +26,10 @@ freq :: Ord a => [a] -> [(a, Int)]
 freq xs =
     let h = M.toList $ hist xs
     in L.sortBy (\b a -> compare (snd a) (snd b)) h
+
+-- a la the one for Seq
+update :: Int -> a -> [a] -> [a]
+update i x xs = take i xs ++ (x : drop (i + 1) xs)
 
 -- python-style reduce which just delegates to foldl
 reduce :: (a -> x -> a) -> [x] -> a -> a

@@ -12,10 +12,6 @@ pass len key =
 part_one :: String -> String
 part_one = pass 8
 
--- a la the one for Seq
-update :: Int -> a -> [a] -> [a]
-update i x xs = take i xs ++ (x : drop (i + 1) xs)
-
 part_two :: String -> String
 part_two key =
     let dpairs = map (\c -> (c !! 5, c !! 6)) (candidates key)
