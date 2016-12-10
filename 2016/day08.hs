@@ -32,9 +32,7 @@ execute d (Col x n) =
     in d//ps'
 
 gasi :: (Read a, Num a) => String -> String -> [a]
-gasi str regex =
-    let ps = regexgrps str regex
-    in map read ps
+gasi str regex = map read (regexgrps str regex)
 
 {-
     "rect 1x2"
