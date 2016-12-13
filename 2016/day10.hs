@@ -10,32 +10,45 @@ type Id = Int
 data Cmd = Load Value Id | Pass Id Id Id | PassDump Id Id Id | DumpPass Id Id Id | Dump Id Id Id deriving (Eq, Show)
 
 instance Ord Cmd where
+--     compare :: Cmd -> Cmd -> Ordering
     compare (Load _ i) (Load _ i') = i `compare` i'
     compare (Load _ _) _ = LT
     compare _ (Load _ _) = GT
     compare (Dump _ _ _) _ = GT
     compare _ (Dump _ _ _) = LT
-    compare (Pass _ l h) (Pass b _ _)
-        | l == b    = LT
-        | h == b    = LT
-    compare (Pass _ l h) (PassDump b _ _)
-        | l == b    = LT
-        | h == b    = LT
-    compare (Pass _ l h) (DumpPass b _ _)
-        | l == b    = LT
-        | h == b    = LT
-    compare (PassDump _ l _) (Pass b _ _)
-        | l == b    = LT
-    compare (PassDump _ l _) (PassDump b _ _)
-        | l == b    = LT
-    compare (PassDump _ l _) (DumpPass b _ _)
-        | l == b    = LT
-    compare (DumpPass _ _ h) (Pass b _ _)
-        | h == b    = LT
-    compare (DumpPass _ _ h) (PassDump b _ _)
-        | h == b    = LT
-    compare (DumpPass _ _ h) (DumpPass b _ _)
-        | h == b    = LT
+    compare (Pass b l h) (Pass b' l' h')
+        | l == b'   = LT
+        | h == b'   = LT
+        | b == l'   = GT
+        | b == h'   = GT
+    compare (Pass b l h) (PassDump b' l' _)
+        | l == b'   = LT
+        | h == b'   = LT
+        | b == l'   = GT
+    compare (Pass b l h) (DumpPass b' _ h')
+        | l == b'   = LT
+        | h == b'   = LT
+        | b == h'   = GT
+    compare (PassDump b l _) (Pass b' l' h')
+        | l == b'   = LT
+        | b == l'   = GT
+        | b == h'   = GT
+    compare (PassDump b l _) (PassDump b' l' _)
+        | l == b'   = LT
+        | b == l'   = GT
+    compare (PassDump b l _) (DumpPass b' _ h')
+        | l == b'   = LT
+        | b == h'   = GT
+    compare (DumpPass b _ h) (Pass b' l' h')
+        | h == b'   = LT
+        | b == l'   = GT
+        | b == h'   = GT
+    compare (DumpPass b _ h) (PassDump b' l' _)
+        | h == b'   = LT
+        | b == l'   = GT
+    compare (DumpPass b _ h) (DumpPass b' _ h')
+        | h == b'   = LT
+        | b == h'   = GT
     compare _ _ = EQ
 
 parse :: String -> Cmd
@@ -63,19 +76,29 @@ part_one input l h =
     where
         f :: (Id, (Value, Maybe Value)) -> Bool
         f (_, (l', Just h')) = l == l' && h == h'
-        f _ = False -- for bots that never got their second value
+        f (_, (_, Nothing)) = False -- for bots that never got their second value
+
         merge :: (Value, Maybe Value) -> (Value, Maybe Value) -> (Value, Maybe Value)
         merge (v, Nothing) (v', Nothing)
             | v < v'    = (v, Just v')
             | otherwise = (v', Just v)
+
         get_low :: Id -> M.Map Id (Value, Maybe Value) -> Value
-        get_low i a =
-            let (Just (v, _)) = M.lookup i a
-            in v
+        get_low i a
+            | M.member i a =
+                let (Just (v, _)) = M.lookup i a
+                in v
+            | otherwise    = error ("ain't no " ++ (show i) ++ " in " ++ (show a))
+
         get_high :: Id -> M.Map Id (Value, Maybe Value) -> Value
-        get_high i a =
-            let (Just (_, Just v)) = M.lookup i a
-            in v
+        get_high i a
+            | M.member i a = rip (M.lookup i a)
+            | otherwise    = error ("ain't no " ++ (show i) ++ " in " ++ (show a))
+            where
+                rip :: Maybe (Value, Maybe Value) -> Value
+                rip (Just (_, Just v)) = v
+                rip (Just (_, Nothing)) = error ("no high for " ++ (show i) ++ " in " ++ (show a))
+
         scn :: M.Map Id (Value, Maybe Value) -> Cmd -> M.Map Id (Value, Maybe Value)
         scn a (Load v i) = M.insertWith merge i (v, Nothing) a
         scn a (Pass i l h) = M.insertWith merge h (get_high i a, Nothing) (M.insertWith merge l (get_low i a, Nothing) a)
@@ -125,9 +148,9 @@ main = do
     print r
     print $ assert (1 == r) "test two passed!"
 
---     let r = part_one input 17 61
---     print r
---     print $ assert (0 == r) "part one passed!"
+    let r = part_one input 17 61
+    print r
+    print $ assert (0 == r) "part one passed!"
 
 --    let r = part_two input
 --    print r
