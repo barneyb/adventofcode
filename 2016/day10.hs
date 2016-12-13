@@ -1,13 +1,42 @@
 import Control.Exception (assert)
 import qualified Data.List as L
-import qualified Data.Map as M
+import qualified Data.Map.Strict as M
 import Utils
 
 type Value = Int
 
 type Id = Int
 
-data Cmd = Load Value Id | Pass Id Id Id | PassDump Id Id Id | DumpPass Id Id Id | Dump Id Id Id deriving (Eq, Show, Ord)
+data Cmd = Load Value Id | Pass Id Id Id | PassDump Id Id Id | DumpPass Id Id Id | Dump Id Id Id deriving (Eq, Show)
+
+instance Ord Cmd where
+    compare (Load _ i) (Load _ i') = i `compare` i'
+    compare (Load _ _) _ = LT
+    compare _ (Load _ _) = GT
+    compare (Dump _ _ _) _ = GT
+    compare _ (Dump _ _ _) = LT
+    compare (Pass _ l h) (Pass b _ _)
+        | l == b    = LT
+        | h == b    = LT
+    compare (Pass _ l h) (PassDump b _ _)
+        | l == b    = LT
+        | h == b    = LT
+    compare (Pass _ l h) (DumpPass b _ _)
+        | l == b    = LT
+        | h == b    = LT
+    compare (PassDump _ l _) (Pass b _ _)
+        | l == b    = LT
+    compare (PassDump _ l _) (PassDump b _ _)
+        | l == b    = LT
+    compare (PassDump _ l _) (DumpPass b _ _)
+        | l == b    = LT
+    compare (DumpPass _ _ h) (Pass b _ _)
+        | h == b    = LT
+    compare (DumpPass _ _ h) (PassDump b _ _)
+        | h == b    = LT
+    compare (DumpPass _ _ h) (DumpPass b _ _)
+        | h == b    = LT
+    compare _ _ = EQ
 
 parse :: String -> Cmd
 parse s
@@ -26,22 +55,33 @@ parse s
             p ("output", "bot") [a,x,y] = DumpPass a x y
             p ("output", "output") [a,x,y] = Dump a x y
 
-loaded_into :: [Cmd] -> Value -> Id
-loaded_into cs v =
-    let Just c = lookup v $ map (\(Load v' i) -> (v', i)) cs
-    in c
-
-pLoadMove :: [Cmd] -> ([Cmd], [Cmd])
-pLoadMove = L.partition p
-    where
-        p :: Cmd -> Bool
-        p (Load _ _) = True
-        p _ = False
-
 part_one :: String -> Int -> Int -> Int
 part_one input l h =
-    let (ls, ps) = pLoadMove $ map parse (lines input)
-    in loaded_into ls l
+    let cs = L.sort $ map parse (lines input)
+        vals = foldl scn M.empty cs
+    in fst $ head $ filter f (M.toList vals)
+    where
+        f :: (Id, (Value, Maybe Value)) -> Bool
+        f (_, (l', Just h')) = l == l' && h == h'
+        f _ = False -- for bots that never got their second value
+        merge :: (Value, Maybe Value) -> (Value, Maybe Value) -> (Value, Maybe Value)
+        merge (v, Nothing) (v', Nothing)
+            | v < v'    = (v, Just v')
+            | otherwise = (v', Just v)
+        get_low :: Id -> M.Map Id (Value, Maybe Value) -> Value
+        get_low i a =
+            let (Just (v, _)) = M.lookup i a
+            in v
+        get_high :: Id -> M.Map Id (Value, Maybe Value) -> Value
+        get_high i a =
+            let (Just (_, Just v)) = M.lookup i a
+            in v
+        scn :: M.Map Id (Value, Maybe Value) -> Cmd -> M.Map Id (Value, Maybe Value)
+        scn a (Load v i) = M.insertWith merge i (v, Nothing) a
+        scn a (Pass i l h) = M.insertWith merge h (get_high i a, Nothing) (M.insertWith merge l (get_low i a, Nothing) a)
+        scn a (DumpPass i _ h) = M.insertWith merge h (get_high i a, Nothing) a
+        scn a (PassDump i l _) = M.insertWith merge l (get_low i a, Nothing) a
+        scn a (Dump _ _ _) = a -- ignore
 
 --part_two :: String -> Int
 --part_two input = length input
