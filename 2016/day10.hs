@@ -9,6 +9,12 @@ type Id = Int
 
 data Cmd = Load Value Id | Pass Id Id Id | PassDump Id Id Id | DumpPass Id Id Id | Dump Id Id Id deriving (Eq, Show)
 
+{-
+this doesn't actually help, because the sort algorithm is efficient.
+if it were bubble sort, I *think* it'd do the right thing, because
+it'd compare every pair, not just enough few enough to get them in
+order. I'm not 100% sure though...
+-}
 instance Ord Cmd where
 --     compare :: Cmd -> Cmd -> Ordering
     compare (Load _ i) (Load _ i') = i `compare` i'
