@@ -9,6 +9,12 @@ type Id = Int
 
 data Cmd = Load Value Id | Pass Id Id Id | PassDump Id Id Id | DumpPass Id Id Id | Dump Id Id Id deriving (Eq, Show)
 
+valuere :: String
+valuere = "value ([0-9]+) goes to bot ([0-9]+)"
+
+passre :: String
+passre = "bot ([0-9]+) gives low to (bot|output) ([0-9]+) and high to (bot|output) ([0-9]+)"
+
 {-
 this doesn't actually help, because the sort algorithm is efficient.
 if it were bubble sort, I *think* it'd do the right thing, because
@@ -60,10 +66,10 @@ instance Ord Cmd where
 parse :: String -> Cmd
 parse s
     | "value" `L.isPrefixOf` s =
-        let [v, b] = map read (regexgrps s "value ([0-9]+) goes to bot ([0-9]+)")
+        let [v, b] = map read (regexgrps s valuere)
         in Load v b
     | otherwise                =
-        let ps = regexgrps s "bot ([0-9]+) gives low to (bot|output) ([0-9]+) and high to (bot|output) ([0-9]+)"
+        let ps = regexgrps s passre
             ds = (ps!!1, ps!!3)
             is = map read [ps!!0, ps!!2, ps!!4]
         in p ds is
