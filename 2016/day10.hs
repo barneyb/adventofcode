@@ -74,6 +74,28 @@ parse s
             p ("output", "bot") [a,x,y] = DumpPass a x y
             p ("output", "output") [a,x,y] = Dump a x y
 
+parse_tests :: IO ()
+parse_tests = do
+    let r = parse "value 0 goes to bot 2"
+    print r
+    print $ assert (Load 0 2 == r) "parse load passed"
+
+    let r = parse "bot 3 gives low to bot 4 and high to bot 5"
+    print r
+    print $ assert (Pass 3 4 5 == r) "parse pass passed"
+
+    let r = parse "bot 6 gives low to output 7 and high to bot 8"
+    print r
+    print $ assert (DumpPass 6 7 8 == r) "parse dump pass passed"
+
+    let r = parse "bot 9 gives low to output 10 and high to output 11"
+    print r
+    print $ assert (Dump 9 10 11 == r) "parse dump passed"
+
+    let r = parse "bot 12 gives low to bot 13 and high to output 14"
+    print r
+    print $ assert (PassDump 12 13 14 == r) "parse pass dump passed"
+
 part_one :: String -> Int -> Int -> Int
 part_one input l h =
     let cs = L.sort $ map parse (lines input)
@@ -126,25 +148,7 @@ test_input =
 main = do
     input <- readFile "day10_input.txt"
 
-    let r = parse "value 0 goes to bot 2"
-    print r
-    print $ assert (Load 0 2 == r) "parse load passed"
-
-    let r = parse "bot 3 gives low to bot 4 and high to bot 5"
-    print r
-    print $ assert (Pass 3 4 5 == r) "parse pass passed"
-
-    let r = parse "bot 6 gives low to output 7 and high to bot 8"
-    print r
-    print $ assert (DumpPass 6 7 8 == r) "parse dump pass passed"
-
-    let r = parse "bot 9 gives low to output 10 and high to output 11"
-    print r
-    print $ assert (Dump 9 10 11 == r) "parse dump passed"
-
-    let r = parse "bot 12 gives low to bot 13 and high to output 14"
-    print r
-    print $ assert (PassDump 12 13 14 == r) "parse pass dump passed"
+    parse_tests
 
     let r = part_one test_input 2 5
     print r
