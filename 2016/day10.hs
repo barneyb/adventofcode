@@ -96,8 +96,13 @@ parse_tests = do
     print r
     print $ assert (PassDump 12 13 14 == r) "parse pass dump passed"
 
-part_one :: String -> Int -> Int -> Int
-part_one input l h =
+{-
+this doesn't do it. it works for simple cases, but the sort isn't good enough
+and I suspect that getting the sort right will also require building the bot
+map, so just calling it dead. Pieces might be useful?
+-}
+part_one_dead :: String -> Int -> Int -> Int
+part_one_dead input l h =
     let cs = L.sort $ map parse (lines input)
         vals = foldl scn M.empty cs
     in fst $ head $ filter f (M.toList vals)
@@ -134,6 +139,9 @@ part_one input l h =
         scn a (PassDump i l _) = M.insertWith merge l (get_low i a, Nothing) a
         scn a (Dump _ _ _) = a -- ignore
 
+part_one :: String -> Int -> Int -> Int
+part_one input l h = -1
+
 --part_two :: String -> Int
 --part_two input = length input
 
@@ -149,6 +157,14 @@ main = do
     input <- readFile "day10_input.txt"
 
     parse_tests
+
+    let r = part_one_dead test_input 2 5
+    print r
+    print $ assert (2 == r) "test one passed!"
+
+    let r = part_one_dead test_input 2 3
+    print r
+    print $ assert (1 == r) "test two passed!"
 
     let r = part_one test_input 2 5
     print r
