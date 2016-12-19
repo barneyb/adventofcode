@@ -81,15 +81,15 @@ which_bot_compares l h ss =
         pred (Bot _ l' h') = l == l' && h == h'
         pred (Bin _ _) = False
 
+part_one :: String -> Int
+part_one input = which_bot_compares 17 61 (interpret (parse_file input))
+
 get_bins :: [Id] -> [Sink] -> [Val]
 get_bins is = map (\(Bin _ v) -> v) . filter (f is)
     where
         f :: [Id] -> Sink -> Bool
         f is (Bot _ _ _) = False
         f is (Bin i _) = i `elem` is
-
-part_one :: String -> Int
-part_one input = which_bot_compares 17 61 (interpret (parse_file input))
 
 part_two :: String -> Int
 part_two input = product $ get_bins [0, 1, 2] (interpret (parse_file input))
