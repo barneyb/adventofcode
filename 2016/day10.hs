@@ -32,21 +32,6 @@ parse s
 parse_file :: String -> [Cmd]
 parse_file input = map parse (lines input)
 
-new_bot :: Id -> Val -> Val -> Sink
-new_bot i x y
-    | x < y     = Bot i x y
-    | otherwise = Bot i y x
-
--- admittedly pointless, but for consistency
-new_bin :: Id -> Val -> Sink
-new_bin i x  = Bin i x
-
-load :: (M.Map Id Sink, M.Map Id Val) -> Val -> Msg -> (M.Map Id Sink, M.Map Id Val)
-load (ss, st) v (ToBot i)
-    | M.member i st = (M.insert i (new_bot i v (st M.! i)) ss, M.delete i st)
-    | otherwise     = (ss, M.insert i v st)
-load (ss, st) v (ToBin i) = (M.insert (1000 + i) (new_bin i v) ss, st)
-
 interpret :: [Cmd] -> [Sink]
 interpret cmds =
     let
@@ -68,6 +53,17 @@ interpret cmds =
                     (ss'', st'') = load (ss', st') h mh
                 in (ss'', st'', cs)
             | otherwise     = (ss, st, c:cs)
+
+        load :: (M.Map Id Sink, M.Map Id Val) -> Val -> Msg -> (M.Map Id Sink, M.Map Id Val)
+        load (ss, st) v (ToBot i)
+            | M.member i st = (M.insert i (new_bot i v (st M.! i)) ss, M.delete i st)
+            | otherwise     = (ss, M.insert i v st)
+        load (ss, st) v (ToBin i) = (M.insert (1000 + i) (Bin i v) ss, st)
+
+        new_bot :: Id -> Val -> Val -> Sink
+        new_bot i x y
+            | x < y     = Bot i x y
+            | otherwise = Bot i y x
 
 which_bot_compares :: Int -> Int -> [Sink] -> Int
 which_bot_compares l h ss =
