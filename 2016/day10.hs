@@ -3,12 +3,6 @@ import qualified Data.List as L
 import qualified Data.Map.Strict as M
 import Utils
 
-valuere :: String
-valuere = "value ([0-9]+) goes to bot ([0-9]+)"
-
-passre :: String
-passre = "bot ([0-9]+) gives low to (bot|output) ([0-9]+) and high to (bot|output) ([0-9]+)"
-
 type Val = Int
 
 type Id = Int
