@@ -56,7 +56,7 @@ sinks cmds =
     in M.elems ss
     where
         next_gen :: (M.Map Id Sink, M.Map Id Val, [Cmd]) -> Int -> (M.Map Id Sink, M.Map Id Val, [Cmd])
-        next_gen a@(sinks, temp, cmds) _ = foldl do_cmd (sinks, temp, []) cmds
+        next_gen (sinks, temp, cmds) _ = foldl do_cmd (sinks, temp, []) cmds
 
         do_cmd :: (M.Map Id Sink, M.Map Id Val, [Cmd]) -> Cmd -> (M.Map Id Sink, M.Map Id Val, [Cmd])
         do_cmd (ss, st, cs) (Get v m) =
