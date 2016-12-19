@@ -58,7 +58,6 @@ sinks cmds =
     let
         gen_factory = scanl next_gen (next_gen (M.empty, M.empty, cmds) 0) [1..]
         gens = span (\(_, _, cs) -> length cs > 0) gen_factory
---         gens = take 5 gen_factory
         (ss, _, _) = head (snd gens)
     in M.elems ss
     where
@@ -86,11 +85,18 @@ which_bot_compares l h ss =
         pred (Bot _ l' h') = l == l' && h == h'
         pred (Bin _ _) = False
 
+get_bins :: [Id] -> [Sink] -> [Val]
+get_bins is = map (\(Bin _ v) -> v) . filter (f is)
+    where
+        f :: [Id] -> Sink -> Bool
+        f is (Bot _ _ _) = False
+        f is (Bin i _) = i `elem` is
+
 part_one :: String -> Int
 part_one input = which_bot_compares 17 61 (sinks (parse_file input))
 
---part_two :: String -> Int
---part_two input = length input
+part_two :: String -> Int
+part_two input = product $ get_bins [0, 1, 2] (sinks (parse_file input))
 
 test_input =
     "value 5 goes to bot 2\n\
@@ -140,6 +146,6 @@ main = do
     print r
     print $ assert (73 == r) "part one passed!"
 
---    let r = part_two input
---    print r
---    print $ assert (0 == r) "part two passed!"
+    let r = part_two input
+    print r
+    print $ assert (3965 == r) "part two passed!"
