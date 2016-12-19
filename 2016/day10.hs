@@ -53,8 +53,7 @@ interpret :: [Cmd] -> [Sink]
 interpret cmds =
     let
         gen_factory = scanl next_gen (M.empty, M.empty, cmds) [1..]
-        gens = dropWhile (\(_, _, cs) -> length cs > 0) gen_factory
-        (ss, _, _) = head gens
+        (ss, _, _) = head $ dropWhile (\(_, _, cs) -> length cs > 0) gen_factory
     in M.elems ss
     where
         next_gen :: Generation -> Int -> Generation
