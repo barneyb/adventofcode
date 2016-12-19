@@ -49,8 +49,8 @@ load (ss, st) v (ToBin i) = (M.insert (1000 + i) (new_bin i v) ss, st)
 
 type Generation = (M.Map Id Sink, M.Map Id Val, [Cmd])
 
-sinks :: [Cmd] -> [Sink]
-sinks cmds =
+interpret :: [Cmd] -> [Sink]
+interpret cmds =
     let
         gen_factory = scanl next_gen (M.empty, M.empty, cmds) [1..]
         gens = dropWhile (\(_, _, cs) -> length cs > 0) gen_factory
@@ -89,10 +89,10 @@ get_bins is = map (\(Bin _ v) -> v) . filter (f is)
         f is (Bin i _) = i `elem` is
 
 part_one :: String -> Int
-part_one input = which_bot_compares 17 61 (sinks (parse_file input))
+part_one input = which_bot_compares 17 61 (interpret (parse_file input))
 
 part_two :: String -> Int
-part_two input = product $ get_bins [0, 1, 2] (sinks (parse_file input))
+part_two input = product $ get_bins [0, 1, 2] (interpret (parse_file input))
 
 test_input =
     "value 5 goes to bot 2\n\
@@ -129,7 +129,7 @@ main = do
     print r
     print $ assert (1 == r) "test two passed!"
 
-    let r = sinks test_cmds
+    let r = interpret test_cmds
     print "generations:"
     foldl1 (>>) (map print r)
     print $ assert (test_gens == r) "generations passed"
