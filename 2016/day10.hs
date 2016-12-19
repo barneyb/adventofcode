@@ -47,6 +47,8 @@ load (ss, st) v (ToBot i)
     | otherwise     = (ss, M.insert i v st)
 load (ss, st) v (ToBin i) = (M.insert (1000 + i) (new_bin i v) ss, st)
 
+type Generation = (M.Map Id Sink, M.Map Id Val, [Cmd])
+
 sinks :: [Cmd] -> [Sink]
 sinks cmds =
     let
@@ -55,10 +57,10 @@ sinks cmds =
         (ss, _, _) = head gens
     in M.elems ss
     where
-        next_gen :: (M.Map Id Sink, M.Map Id Val, [Cmd]) -> Int -> (M.Map Id Sink, M.Map Id Val, [Cmd])
+        next_gen :: Generation -> Int -> Generation
         next_gen (sinks, temp, cmds) _ = foldl do_cmd (sinks, temp, []) cmds
 
-        do_cmd :: (M.Map Id Sink, M.Map Id Val, [Cmd]) -> Cmd -> (M.Map Id Sink, M.Map Id Val, [Cmd])
+        do_cmd :: Generation -> Cmd -> Generation
         do_cmd (ss, st, cs) (Get v m) =
             let (ss', st') = load (ss, st) v m
             in (ss', st', cs)
