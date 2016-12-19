@@ -11,6 +11,6 @@ main = do
     let r = part_one input
     print r
     print $ assert (0 == r) "part one passed!"
---    let r = part_two input
---    print r
---    print $ assert (0 == r) "part two passed!"
+--     let r = part_two input
+--     print r
+--     print $ assert (0 == r) "part two passed!"
