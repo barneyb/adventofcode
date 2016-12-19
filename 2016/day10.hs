@@ -20,7 +20,20 @@ data Cmd = Get Val Msg | Pass Id Msg Msg deriving (Show, Eq)
 data Msg = ToBot Id | ToBin Id deriving (Show, Eq)
 
 parse :: String -> Cmd
-parse s = Get 1 (ToBot 2)
+parse s
+    | "value" `L.isPrefixOf` s =
+        let [v, b] = map read (regexgrps s "value ([0-9]+) goes to bot ([0-9]+)")
+        in Get v (ToBot b)
+    | otherwise                =
+        let ps = regexgrps s "bot ([0-9]+) gives low to (bot|output) ([0-9]+) and high to (bot|output) ([0-9]+)"
+            ds = [ps!!1, ps!!3]
+            is = map read [ps!!0, ps!!2, ps!!4]
+            ms = map to_msg (zip ds (tail is))
+        in Pass (head is) (ms!!0) (ms!!1)
+        where
+            to_msg :: (String, Int) -> Msg
+            to_msg ("bot", i) = ToBot i
+            to_msg ("output", i) = ToBin i
 
 parse_file :: String -> [Cmd]
 parse_file input = map parse (lines input)
@@ -123,9 +136,9 @@ main = do
     print r
     print $ assert (test_cmds == r) "parse test passed!"
 
---     let r = part_one input
---     print r
---     print $ assert (0 == r) "part one passed!"
+    let r = part_one input
+    print r
+    print $ assert (73 == r) "part one passed!"
 
 --    let r = part_two input
 --    print r
