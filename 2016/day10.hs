@@ -50,7 +50,7 @@ load (ss, st) v (ToBin i) = (M.insert (1000 + i) (new_bin i v) ss, st)
 sinks :: [Cmd] -> [Sink]
 sinks cmds =
     let
-        gen_factory = scanl next_gen (next_gen (M.empty, M.empty, cmds) 0) [1..]
+        gen_factory = scanl next_gen (M.empty, M.empty, cmds) [1..]
         gens = span (\(_, _, cs) -> length cs > 0) gen_factory
         (ss, _, _) = head (snd gens)
     in M.elems ss
