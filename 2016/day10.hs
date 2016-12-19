@@ -51,8 +51,8 @@ sinks :: [Cmd] -> [Sink]
 sinks cmds =
     let
         gen_factory = scanl next_gen (M.empty, M.empty, cmds) [1..]
-        gens = span (\(_, _, cs) -> length cs > 0) gen_factory
-        (ss, _, _) = head (snd gens)
+        gens = dropWhile (\(_, _, cs) -> length cs > 0) gen_factory
+        (ss, _, _) = head gens
     in M.elems ss
     where
         next_gen :: (M.Map Id Sink, M.Map Id Val, [Cmd]) -> Int -> (M.Map Id Sink, M.Map Id Val, [Cmd])
