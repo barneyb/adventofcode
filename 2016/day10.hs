@@ -40,14 +40,14 @@ load (ss, st) v (ToBot i)
     | otherwise     = (ss, M.insert i v st)
 load (ss, st) v (ToBin i) = (M.insert (1000 + i) (new_bin i v) ss, st)
 
-generations :: [Cmd] -> [[Sink]]
-generations cmds =
+sinks :: [Cmd] -> [Sink]
+sinks cmds =
     let
         gen_factory = scanl next_gen (next_gen (M.empty, M.empty, cmds) 0) [1..]
         gens = span (\(_, _, cs) -> length cs > 0) gen_factory
 --         gens = take 5 gen_factory
-        gens' = (fst gens) ++ [head (snd gens)]
-    in map (\(ss, _, _) -> M.elems ss) gens'
+        (ss, _, _) = head (snd gens)
+    in M.elems ss
     where
         next_gen :: (M.Map Id Sink, M.Map Id Val, [Cmd]) -> Int -> (M.Map Id Sink, M.Map Id Val, [Cmd])
         next_gen a@(sinks, temp, cmds) _ = foldl do_cmd (sinks, temp, []) cmds
@@ -64,9 +64,9 @@ generations cmds =
                 in (ss'', st'', cs)
             | otherwise     = (ss, st, c:cs)
 
-which_bot_compares :: Int -> Int -> [[Sink]] -> Int
-which_bot_compares l h gens =
-    let Just (Bot i _ _) = L.find pred (concat gens)
+which_bot_compares :: Int -> Int -> [Sink] -> Int
+which_bot_compares l h ss =
+    let Just (Bot i _ _) = L.find pred ss
     in i
     where
         pred :: Sink -> Bool
@@ -74,7 +74,7 @@ which_bot_compares l h gens =
         pred (Bin _ _) = False
 
 part_one :: String -> Int
-part_one input = which_bot_compares 17 61 (generations (parse_file input))
+part_one input = which_bot_compares 17 61 (sinks (parse_file input))
 
 --part_two :: String -> Int
 --part_two input = length input
@@ -95,15 +95,12 @@ test_cmds = [ Get 5 (ToBot 2)
             , Get 2 (ToBot 2)
             ]
 
-test_gens = [ [ Bot 2 2 5
-              ]
-            , [ Bot 1 2 3
-              , Bin 1 2
-              ]
-            , [ Bot 0 3 5
-              , Bin 0 5
-              , Bin 2 3
-              ]
+test_gens = [ Bot 0 3 5
+            , Bot 1 2 3
+            , Bot 2 2 5
+            , Bin 0 5
+            , Bin 1 2
+            , Bin 2 3
             ]
 
 main = do
@@ -117,14 +114,14 @@ main = do
     print r
     print $ assert (1 == r) "test two passed!"
 
-    let r = generations test_cmds
+    let r = sinks test_cmds
     print "generations:"
     foldl1 (>>) (map print r)
     print $ assert (test_gens == r) "generations passed"
 
---     let r = parse_file test_input
---     print r
---     print $ assert (test_cmds == r) "parse test passed!"
+    let r = parse_file test_input
+    print r
+    print $ assert (test_cmds == r) "parse test passed!"
 
 --     let r = part_one input
 --     print r
