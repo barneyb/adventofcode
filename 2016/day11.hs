@@ -2,9 +2,9 @@ import Control.Exception (assert)
 import qualified Data.List as L
 import qualified Data.Map.Strict as M
 
-data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium | Hydrogen | Lithium deriving (Eq, Show)
+data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium | Hydrogen | Lithium deriving (Eq, Ord, Show)
 
-data Item = Generator Element | Microchip Element deriving (Eq, Show)
+data Item = Generator Element | Microchip Element deriving (Eq, Ord, Show)
 
 data Floor = First | Second | Third | Fourth deriving (Eq, Ord, Enum, Show)
 
@@ -52,9 +52,38 @@ items w f =
 derive :: World -> [World]
 derive w =
     let f = elevator w
+        g = 1 + generation w
+    in map (\(tf, (f, is), (f', is')) ->
+        World { elevator = tf
+              , itemsByFloor = M.insert f is (M.insert f' is' (itemsByFloor w))
+              , generation = g
+              }) (mods w)
+
+mods :: World -> [(Floor, (Floor, [Item]), (Floor, [Item]))]
+mods w =
+    let f = elevator w
         is = items w f
-        sss = filter ((== 2) . length) (L.subsequences is)
-    in []
+        one_splits = get_splits is
+        splits = one_splits ++ (split_again one_splits)
+        tfs = tgt_floors f
+    in concat $
+        map (\tf ->
+            map (\s ->
+                (tf, (f, snd s), (tf, (items w tf) ++ (fst s)))) splits) tfs
+
+get_splits :: Ord a => [a] -> [([a], [a])]
+get_splits xs = map (\x -> ([x], L.delete x xs)) xs
+
+split_again :: Ord a => [([a], [a])] -> [([a], [a])]
+split_again ss = L.nub $ concat $
+    map (\(x, xs) ->
+        map (\(y, ys) ->
+            (L.sort (x++y), ys)) (get_splits xs)) ss
+
+tgt_floors :: Floor -> [Floor]
+tgt_floors First = [Second]
+tgt_floors Fourth = [Third]
+tgt_floors f = [pred f, succ f]
 
 part_one :: ItemMap -> Int
 part_one input =
