@@ -60,7 +60,7 @@ part_one :: ItemMap -> Int
 part_one input =
     let w = World { elevator=First
                   , itemsByFloor=input
-                  , generation=1
+                  , generation=0
                   }
         world_factory = scanl next_gen [w] [1..]
         gen = head $ dropWhile check_gen world_factory
@@ -86,7 +86,7 @@ main = do
 
     print $ assert (is_valid_world World { elevator=First
                                          , itemsByFloor=test_input
-                                         , generation=1
+                                         , generation=0
                                          }) "is valid world passed"
 
     let r = part_one test_input
