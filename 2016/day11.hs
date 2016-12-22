@@ -79,7 +79,7 @@ world_factory :: World -> [Generation]
 world_factory w = scanl next_gen (0, [w]) [1..]
 
 next_gen :: Generation -> Int -> Generation
-next_gen (_, ws) n = (n, filter is_valid_world (L.nub $ concat $ map derive ws))
+next_gen (_, ws) n = (n, L.nub $ filter is_valid_world (concat $ map derive ws))
 
 check_gen :: Generation -> Bool
 check_gen (n, ws) = if length ws == 0
