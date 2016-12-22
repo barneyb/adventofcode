@@ -2,7 +2,7 @@ import Control.Exception (assert)
 import Utils
 
 candidates :: String -> [String]
-candidates key = filter (\ h -> "00000" == (take 5 h)) (map (nhash key) [0..])
+candidates key = filter ((== "00000") . (take 5)) (map (nhash key) [0..])
 
 pass :: Int -> String -> String
 pass len key = take len (map (!! 5) (candidates key))
