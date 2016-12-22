@@ -61,9 +61,7 @@ items w f =
 
 derive :: World -> [World]
 derive w = map (\(tf, (f, is), (f', is')) ->
-        World { elevator = tf
-              , itemsByFloor = M.insert f is (M.insert f' is' (itemsByFloor w))
-              }) (mods w)
+    from_el_items tf $ M.insert f is (M.insert f' is' (itemsByFloor w))) (mods w)
 
 mods :: World -> [(Floor, (Floor, [Item]), (Floor, [Item]))]
 mods w =
@@ -119,10 +117,13 @@ check_gen (n, ws) =
         then error ("generation " ++ show n ++ " is too big: " ++ (show l))
         else all (not . is_complete) ws
 
+from_el_items :: Floor -> ItemMap -> World
+from_el_items f m = World { elevator=f
+                          , itemsByFloor=m
+                          }
+
 from_items :: ItemMap -> World
-from_items m = World { elevator=First
-                     , itemsByFloor=m
-                     }
+from_items = from_el_items First
 
 part_one :: ItemMap -> Int
 part_one input =
