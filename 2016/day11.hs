@@ -20,8 +20,8 @@ type Generation = (Int, [World])
 
 is_valid_items :: [Item] -> Bool
 is_valid_items is =
-    let gs = map (\(e, _) -> e) $ filter (\(_, t) -> t == Generator) is
-        ms = map (\(e, _) -> e) $ filter (\(_, t) -> t == Microchip) is
+    let gs = map fst $ filter ((== Generator) . snd) is
+        ms = map fst $ filter ((== Microchip) . snd) is
     in (length gs == 0) || (length ms == 0) || (all (`elem` gs) ms)
 
 is_valid_world :: World -> Bool
