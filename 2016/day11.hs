@@ -112,12 +112,13 @@ test_input = M.fromList [ (First, [ Microchip Hydrogen, Microchip Lithium ])
                         , (Third, [ Generator Lithium ])
                         , (Fourth, [ ])
                         ]
+test_world = World { elevator=First
+                   , itemsByFloor=test_input
+                   }
 
 main = do
 
-    print $ assert (is_valid_world World { elevator=First
-                                         , itemsByFloor=test_input
-                                         }) "is valid world passed"
+    print $ assert (is_valid_world test_world) "is valid world passed"
 
     let r = part_one test_input
     print r
@@ -140,7 +141,7 @@ main = do
 --                            , (Third, [ Generator Promethium, Microchip Promethium, Generator Ruthenium, Microchip Ruthenium ])
 --                            , (Fourth, [ ])
 --                            ]
-
+--
 --     let r = part_one input
 --     print r
 --     print $ assert (0 == r) "part one passed!"
