@@ -88,12 +88,14 @@ world_factory :: World -> [Generation]
 world_factory w = scanl next_gen (0, [w]) [1..]
 
 next_gen :: Generation -> Int -> Generation
-next_gen (_, ws) n = (n, filter is_valid_world (concat $ map derive ws))
+next_gen (_, ws) n = (n, filter is_valid_world (L.nub $ concat $ map derive ws))
 
 check_gen :: Generation -> Bool
 check_gen (_, ws) = if length ws == 0
     then error "empty generation before solving..."
-    else if length ws > 375000 -- 375-380K for the example
+    -- 375-380K for the example w/o nub
+    -- 425-450 (not K!) for the example w/ nub
+    else if length ws > 450
     then error "generation is too big"
     else all (not . is_complete) ws
 
