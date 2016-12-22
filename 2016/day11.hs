@@ -2,6 +2,7 @@ import Control.Exception (assert)
 import qualified Data.List as L
 import qualified Data.Set as S
 import qualified Data.Map.Strict as M
+import Utils
 
 data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium | Hydrogen | Lithium deriving (Eq, Ord, Bounded, Enum, Show)
 
@@ -16,6 +17,23 @@ type ItemMap = M.Map Floor [Item]
 data World = World { elevator :: Floor
                    , itemsByFloor :: ItemMap
                    } deriving (Eq, Ord, Show)
+
+draw :: World -> [String]
+draw w = map (\f ->
+    unwords $ (elv f) : (map (el f) [minBound..])) (reverse [minBound..])
+    where
+        elv :: Floor -> String
+        elv f = if elevator w == f then "E" else "."
+
+        el :: Floor -> Element -> String
+        el f e =
+            let p = elp f e
+            in unwords [p Generator, p Microchip]
+
+        elp :: Floor -> Element -> Type -> String
+        elp f e t
+            | (e, t) `elem` (items w f) = head (show e) : [head (show t)]
+            | otherwise                 = ". "
 
 type Generation = (Int, [World])
 
@@ -120,9 +138,12 @@ main = do
 
     print $ assert (is_valid_world test_world) "is valid world passed"
 
-    let r = part_one test_input
-    print r
-    print $ assert (11 == r) "test one passed!"
+    print "example:"
+    prints $ draw test_world
+
+--     let r = part_one test_input
+--     print r
+--     print $ assert (11 == r) "test one passed!"
 
     {-
     The first floor contains a thulium generator, a thulium-compatible microchip, a plutonium generator, and a strontium generator.
@@ -142,9 +163,12 @@ main = do
                            , (Fourth, [ ])
                            ]
 
-    let r = part_one input
-    print r
-    print $ assert (0 == r) "part one passed!"
+    print "puzzle:"
+    prints $ draw (from_items input)
+
+--     let r = part_one input
+--     print r
+--     print $ assert (0 == r) "part one passed!"
 
 --     let r = part_two input
 --     print r
