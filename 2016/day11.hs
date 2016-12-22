@@ -95,7 +95,7 @@ check_gen (_, ws) = if length ws == 0
     then error "empty generation before solving..."
     -- 375-380K for the example w/o nub
     -- 425-450 (not K!) for the example w/ nub
-    else if length ws > 450
+    else if length ws > 500000
     then error "generation is too big"
     else all (not . is_complete) ws
 
@@ -138,15 +138,15 @@ main = do
     1  TG  TM  PG  .   SG  .   .   .   .   .
     -}
 
---     let input = M.fromList [ (First, [ Generator Thulium, Microchip Thulium, Generator Plutonium, Generator Strontium ])
---                            , (Second, [ Microchip Plutonium, Microchip Strontium ])
---                            , (Third, [ Generator Promethium, Microchip Promethium, Generator Ruthenium, Microchip Ruthenium ])
---                            , (Fourth, [ ])
---                            ]
---
---     let r = part_one input
---     print r
---     print $ assert (0 == r) "part one passed!"
+    let input = M.fromList [ (First, [ Generator Thulium, Microchip Thulium, Generator Plutonium, Generator Strontium ])
+                           , (Second, [ Microchip Plutonium, Microchip Strontium ])
+                           , (Third, [ Generator Promethium, Microchip Promethium, Generator Ruthenium, Microchip Ruthenium ])
+                           , (Fourth, [ ])
+                           ]
+
+    let r = part_one input
+    print r
+    print $ assert (0 == r) "part one passed!"
 
 --     let r = part_two input
 --     print r
