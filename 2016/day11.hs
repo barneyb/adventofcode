@@ -42,24 +42,22 @@ items w f =
     in is
 
 derive :: World -> [World]
-derive w =
-    let f = elevator w
-    in map (\(tf, (f, is), (f', is')) ->
+derive w = map (\(tf, (f, is), (f', is')) ->
         World { elevator = tf
               , itemsByFloor = M.insert f is (M.insert f' is' (itemsByFloor w))
               }) (mods w)
 
 mods :: World -> [(Floor, (Floor, [Item]), (Floor, [Item]))]
 mods w =
-    let f = elevator w
-        is = items w f
+    let e = elevator w
+        is = items w e
         one_splits = get_splits is
         splits = one_splits ++ (split_again one_splits)
-        tfs = tgt_floors f
+        tfs = tgt_floors e
     in concat $
         map (\tf ->
             map (\s ->
-                (tf, (f, snd s), (tf, (items w tf) ++ (fst s)))) splits) tfs
+                (tf, (e, snd s), (tf, (items w tf) ++ (fst s)))) splits) tfs
 
 get_splits :: Ord a => [a] -> [([a], [a])]
 get_splits xs = map (\x -> ([x], L.delete x xs)) xs
