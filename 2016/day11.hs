@@ -12,8 +12,9 @@ type ItemMap = M.Map Floor [Item]
 
 data World = World { elevator :: Floor
                    , itemsByFloor :: ItemMap
-                   , generation :: Int
                    } deriving (Eq, Show)
+
+type Generation = (Int, [World])
 
 is_generator :: Item -> Bool
 is_generator (Generator _) = True
@@ -52,11 +53,9 @@ items w f =
 derive :: World -> [World]
 derive w =
     let f = elevator w
-        g = 1 + generation w
     in map (\(tf, (f, is), (f', is')) ->
         World { elevator = tf
               , itemsByFloor = M.insert f is (M.insert f' is' (itemsByFloor w))
-              , generation = g
               }) (mods w)
 
 mods :: World -> [(Floor, (Floor, [Item]), (Floor, [Item]))]
@@ -89,18 +88,19 @@ part_one :: ItemMap -> Int
 part_one input =
     let w = World { elevator=First
                   , itemsByFloor=input
-                  , generation=0
                   }
-        world_factory = scanl next_gen [w] [1..]
+        world_factory = scanl next_gen (0, [w]) [1..]
         gen = head $ dropWhile check_gen world_factory
-    in generation $ head gen
+    in fst gen
     where
-        next_gen :: [World] -> Int -> [World]
-        next_gen ws _ = filter is_valid_world (concat $ map derive ws)
+        next_gen :: Generation -> Int -> Generation
+        next_gen (_, ws) n = (n, filter is_valid_world (concat $ map derive ws))
 
-        check_gen :: [World] -> Bool
-        check_gen ws = if length ws == 0
+        check_gen :: Generation -> Bool
+        check_gen (_, ws) = if length ws == 0
             then error "empty generation before solving..."
+            else if length ws > 375000
+            then error "generation is too big"
             else all (not . is_complete) ws
 
 --part_two :: String -> Int
@@ -115,7 +115,6 @@ main = do
 
     print $ assert (is_valid_world World { elevator=First
                                          , itemsByFloor=test_input
-                                         , generation=0
                                          }) "is valid world passed"
 
     let r = part_one test_input
