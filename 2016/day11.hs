@@ -22,7 +22,7 @@ is_valid_items :: [Item] -> Bool
 is_valid_items is =
     let gs = map fst $ filter ((== Generator) . snd) is
         ms = map fst $ filter ((== Microchip) . snd) is
-    in (length gs == 0) || (length ms == 0) || (all (`elem` gs) ms)
+    in (null gs) || (null ms) || (all (`elem` gs) ms)
 
 is_valid_world :: World -> Bool
 is_valid_world w = all is_valid_items (M.elems (itemsByFloor w))
@@ -34,7 +34,7 @@ is_complete w
         let f1 = items w First
             f2 = items w Second
             f3 = items w Third
-        in L.all ((== 0) . length) [f1, f2, f3]
+        in L.all null [f1, f2, f3]
 
 items :: World -> Floor -> [Item]
 items w f =
