@@ -28,13 +28,11 @@ is_valid_world :: World -> Bool
 is_valid_world w = all is_valid_items (M.elems (itemsByFloor w))
 
 is_complete :: World -> Bool
-is_complete w
-    | not (is_valid_world w) = False
-    | otherwise              =
-        let f1 = items w First
-            f2 = items w Second
-            f3 = items w Third
-        in L.all null [f1, f2, f3]
+is_complete w =
+    let f1 = items w First
+        f2 = items w Second
+        f3 = items w Third
+    in L.all null [f1, f2, f3]
 
 items :: World -> Floor -> [Item]
 items w f =
