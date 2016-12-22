@@ -2,6 +2,7 @@ import Control.Exception (assert)
 import qualified Data.List as L
 import qualified Data.Set as S
 import qualified Data.Map.Strict as M
+import Debug.Trace
 import Utils
 
 data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium deriving (Eq, Ord, Bounded, Enum, Show)
@@ -59,7 +60,7 @@ items w f =
     in is
 
 derive :: World -> [World]
-derive w = filter is_valid_world $ map (\(tf, (f, is), (f', is')) ->
+derive w = map (\(tf, (f, is), (f', is')) ->
         World { elevator = tf
               , itemsByFloor = M.insert f is (M.insert f' is' (itemsByFloor w))
               }) (mods w)
@@ -92,13 +93,15 @@ neighbors f
     | otherwise     = [pred f, succ f]
 
 world_factory :: World -> [Generation]
-world_factory w = scanl next_gen (0, [w]) [1..]
+world_factory w = map fst $ L.scanl next_gen ((0, [w]), S.empty) [1..]
 
-next_gen :: Generation -> Int -> Generation
-next_gen (_, ws) n =
-    let ws' = (concat $ map derive ws)
-        (ws'', _) = foldl f ([], S.empty) ws'
-    in (n, ws'')
+next_gen :: (Generation, S.Set World) -> Int -> (Generation, S.Set World)
+next_gen ((_, ws), aws) n =
+    let drvd = concat $ map derive ws
+        valid = filter is_valid_world drvd
+        (ws', aws') = L.foldl' f ([], aws) valid
+        l xs = show $ length xs
+    in trace ("gen " ++ (show n) ++ ": from " ++ (l ws) ++ " derive " ++ (l drvd) ++ " with " ++ (l valid) ++ " valid and " ++ (l ws') ++ " new") ((n, ws'), aws')
     where
         f :: ([World], S.Set World) -> World -> ([World], S.Set World)
         f (ws, aws) w
