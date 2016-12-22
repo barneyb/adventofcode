@@ -8,7 +8,7 @@ data Type = Generator | Microchip deriving (Eq, Ord, Show)
 
 type Item = (Element, Type)
 
-data Floor = First | Second | Third | Fourth deriving (Eq, Ord, Enum, Show)
+data Floor = First | Second | Third | Fourth deriving (Eq, Ord, Bounded, Enum, Show)
 
 type ItemMap = M.Map Floor [Item]
 
@@ -51,7 +51,7 @@ mods w =
         is = items w e
         one_splits = get_splits is
         splits = one_splits ++ (split_again one_splits)
-        tfs = tgt_floors e
+        tfs = neighbors e
     in concat $
         map (\tf ->
             map (\s ->
@@ -66,10 +66,11 @@ split_again ss = L.nub $ concat $
         map (\(y, ys) ->
             (L.sort (x++y), ys)) (get_splits xs)) ss
 
-tgt_floors :: Floor -> [Floor]
-tgt_floors First = [Second]
-tgt_floors Fourth = [Third]
-tgt_floors f = [pred f, succ f]
+neighbors :: (Eq a, Bounded a, Enum a) => a -> [a]
+neighbors f
+    | f == minBound = [succ f]
+    | f == maxBound = [pred f]
+    | otherwise     = [pred f, succ f]
 
 world_factory :: World -> [Generation]
 world_factory w = scanl next_gen (0, [w]) [1..]
