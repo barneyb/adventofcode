@@ -4,7 +4,9 @@ import qualified Data.Map.Strict as M
 
 data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium | Hydrogen | Lithium deriving (Eq, Ord, Show)
 
-data Item = Generator Element | Microchip Element deriving (Eq, Ord, Show)
+data Type = Generator | Microchip deriving (Eq, Ord, Show)
+
+type Item = (Element, Type)
 
 data Floor = First | Second | Third | Fourth deriving (Eq, Ord, Enum, Show)
 
@@ -16,22 +18,11 @@ data World = World { elevator :: Floor
 
 type Generation = (Int, [World])
 
-is_generator :: Item -> Bool
-is_generator (Generator _) = True
-is_generator (Microchip _) = False
-
-is_microchip :: Item -> Bool
-is_microchip (Generator _) = False
-is_microchip (Microchip _) = True
-
 is_valid_items :: [Item] -> Bool
-is_valid_items is
-    | all is_generator is = True
-    | all is_microchip is = True
-    | otherwise           =
-        let gs = map (\(Generator e) -> e) $ filter is_generator is
-            ms = map (\(Microchip e) -> e) $ filter is_microchip is
-        in all (`elem` gs) ms
+is_valid_items is =
+    let gs = map (\(e, _) -> e) $ filter (\(_, t) -> t == Generator) is
+        ms = map (\(e, _) -> e) $ filter (\(_, t) -> t == Microchip) is
+    in (length gs == 0) || (length ms == 0) || (all (`elem` gs) ms)
 
 is_valid_world :: World -> Bool
 is_valid_world w = all is_valid_items (M.elems (itemsByFloor w))
@@ -109,9 +100,9 @@ part_one input =
 --part_two :: String -> Int
 --part_two input = length input
 
-test_input = M.fromList [ (First, [ Microchip Hydrogen, Microchip Lithium ])
-                        , (Second, [ Generator Hydrogen ])
-                        , (Third, [ Generator Lithium ])
+test_input = M.fromList [ (First, [ (Hydrogen, Microchip), (Lithium , Microchip)])
+                        , (Second, [ (Hydrogen , Generator)])
+                        , (Third, [ (Lithium , Generator)])
                         , (Fourth, [ ])
                         ]
 test_world = World { elevator=First
@@ -138,9 +129,9 @@ main = do
     1  TG  TM  PG  .   SG  .   .   .   .   .
     -}
 
-    let input = M.fromList [ (First, [ Generator Thulium, Microchip Thulium, Generator Plutonium, Generator Strontium ])
-                           , (Second, [ Microchip Plutonium, Microchip Strontium ])
-                           , (Third, [ Generator Promethium, Microchip Promethium, Generator Ruthenium, Microchip Ruthenium ])
+    let input = M.fromList [ (First, [ (Thulium, Generator), (Thulium, Microchip), (Plutonium, Generator), (Strontium , Generator)])
+                           , (Second, [ (Plutonium, Microchip), (Strontium , Microchip)])
+                           , (Third, [ (Promethium, Generator), (Promethium, Microchip), (Ruthenium, Generator), (Ruthenium , Microchip)])
                            , (Fourth, [ ])
                            ]
 
