@@ -1,5 +1,6 @@
 import Control.Exception (assert)
 import qualified Data.List as L
+import qualified Data.Set as S
 import qualified Data.Map.Strict as M
 
 data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium | Hydrogen | Lithium deriving (Eq, Ord, Show)
@@ -14,7 +15,7 @@ type ItemMap = M.Map Floor [Item]
 
 data World = World { elevator :: Floor
                    , itemsByFloor :: ItemMap
-                   } deriving (Eq, Show)
+                   } deriving (Eq, Ord, Show)
 
 type Generation = (Int, [World])
 
@@ -76,14 +77,22 @@ world_factory :: World -> [Generation]
 world_factory w = scanl next_gen (0, [w]) [1..]
 
 next_gen :: Generation -> Int -> Generation
-next_gen (_, ws) n = (n, L.nub $ filter is_valid_world (concat $ map derive ws))
+next_gen (_, ws) n =
+    let ws' = filter is_valid_world (concat $ map derive ws)
+        (ws'', _) = foldl f ([], S.empty) ws'
+    in (n, ws'')
+    where
+        f :: ([World], S.Set World) -> World -> ([World], S.Set World)
+        f (ws, aws) w
+            | S.member w aws = (ws, aws)
+            | otherwise      = (w:ws, S.insert w aws)
 
 check_gen :: Generation -> Bool
 check_gen (n, ws) = if length ws == 0
     then error ("generation " ++ show n ++ " is empty")
     -- 375-380K for the example w/o nub
     -- 425-450 (not K!) for the example w/ nub
-    else if length ws > 10000
+    else if length ws > 100000
     then error ("generation " ++ show n ++ " is too big: " ++ (show $ length ws))
     else all (not . is_complete) ws
 
