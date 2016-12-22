@@ -121,10 +121,10 @@ main = do
     The third floor contains a promethium generator, a promethium-compatible microchip, a ruthenium generator, and a ruthenium-compatible microchip.
     The fourth floor contains nothing relevant.
 
-    4  .   .   .   .   .   .   .   .   .   .
-    3  .   .   .   .   .   .   FG  FM  RG  RM
-    2  .   .   .   PM  .   SM  .   .   .   .
-    1  TG  TM  PG  .   SG  .   .   .   .   .
+    .  .   .   .   .   .   .   .   .   .   .
+    .  .   .   .   .   .   .   FG  FM  RG  RM
+    .  .   .   .   PM  .   SM  .   .   .   .
+    E  TG  TM  PG  .   SG  .   .   .   .   .
     -}
 
     let input = M.fromList [ (First, [ (Thulium, Generator), (Thulium, Microchip), (Plutonium, Generator), (Strontium , Generator)])
