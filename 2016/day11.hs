@@ -41,7 +41,7 @@ items w f =
     in is
 
 derive :: World -> [World]
-derive w = map (\(tf, (f, is), (f', is')) ->
+derive w = filter is_valid_world $ map (\(tf, (f, is), (f', is')) ->
         World { elevator = tf
               , itemsByFloor = M.insert f is (M.insert f' is' (itemsByFloor w))
               }) (mods w)
@@ -78,7 +78,7 @@ world_factory w = scanl next_gen (0, [w]) [1..]
 
 next_gen :: Generation -> Int -> Generation
 next_gen (_, ws) n =
-    let ws' = filter is_valid_world (concat $ map derive ws)
+    let ws' = (concat $ map derive ws)
         (ws'', _) = foldl f ([], S.empty) ws'
     in (n, ws'')
     where
