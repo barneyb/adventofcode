@@ -3,9 +3,9 @@ import qualified Data.List as L
 import qualified Data.Set as S
 import qualified Data.Map.Strict as M
 
-data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium | Hydrogen | Lithium deriving (Eq, Ord, Show)
+data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium | Hydrogen | Lithium deriving (Eq, Ord, Bounded, Enum, Show)
 
-data Type = Generator | Microchip deriving (Eq, Ord, Show)
+data Type = Generator | Microchip deriving (Eq, Ord, Enum, Show)
 
 type Item = (Element, Type)
 
