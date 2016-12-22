@@ -146,9 +146,9 @@ main = do
     print "example:"
     prints $ draw test_world
 
---     let r = part_one test_input
---     print r
---     print $ assert (11 == r) "test one passed!"
+    let r = part_one test_input
+    print ((show r) ++ " generations")
+    print $ assert (11 == r) "test one passed!"
 
     {-
     The first floor contains a thulium generator, a thulium-compatible microchip, a plutonium generator, and a strontium generator.
@@ -171,9 +171,9 @@ main = do
     print "puzzle:"
     prints $ draw (from_items input)
 
---     let r = part_one input
---     print r
---     print $ assert (0 == r) "part one passed!"
+    let r = part_one input
+    print ((show r) ++ " generations")
+    print $ assert (0 == r) "part one passed!"
 
 --     let r = part_two input
 --     print r
