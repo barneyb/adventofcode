@@ -91,12 +91,12 @@ next_gen :: Generation -> Int -> Generation
 next_gen (_, ws) n = (n, filter is_valid_world (L.nub $ concat $ map derive ws))
 
 check_gen :: Generation -> Bool
-check_gen (_, ws) = if length ws == 0
-    then error "empty generation before solving..."
+check_gen (n, ws) = if length ws == 0
+    then error ("generation " ++ show n ++ " is empty")
     -- 375-380K for the example w/o nub
     -- 425-450 (not K!) for the example w/ nub
-    else if length ws > 500000
-    then error "generation is too big"
+    else if length ws > 10000
+    then error ("generation " ++ show n ++ " is too big: " ++ (show $ length ws))
     else all (not . is_complete) ws
 
 part_one :: ItemMap -> Int
