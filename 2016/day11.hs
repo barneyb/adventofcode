@@ -109,13 +109,15 @@ next_gen ((_, ws), aws) n =
             | otherwise      = (w:ws, S.insert w aws)
 
 check_gen :: Generation -> Bool
-check_gen (n, ws) = if length ws == 0
-    then error ("generation " ++ show n ++ " is empty")
-    -- 375-380K for the example w/o nub
-    -- 425-450 (not K!) for the example w/ nub
-    else if length ws > 100000
-    then error ("generation " ++ show n ++ " is too big: " ++ (show $ length ws))
-    else all (not . is_complete) ws
+check_gen (n, ws) =
+    let l = length ws
+    in if null ws
+        then error ("generation " ++ show n ++ " is empty")
+        -- 375-380K for the example w/o nub
+        -- 425-450 (not K!) for the example w/ nub
+        else if l > 100000
+        then error ("generation " ++ show n ++ " is too big: " ++ (show l))
+        else all (not . is_complete) ws
 
 from_items :: ItemMap -> World
 from_items m = World { elevator=First
