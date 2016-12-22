@@ -4,7 +4,7 @@ import qualified Data.Set as S
 import qualified Data.Map.Strict as M
 import Utils
 
-data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium | Hydrogen | Lithium deriving (Eq, Ord, Bounded, Enum, Show)
+data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium deriving (Eq, Ord, Bounded, Enum, Show)
 
 data Type = Generator | Microchip deriving (Eq, Ord, Enum, Show)
 
@@ -127,9 +127,9 @@ part_one input =
 --part_two :: String -> Int
 --part_two input = length input
 
-test_input = M.fromList [ (First, [ (Hydrogen, Microchip), (Lithium , Microchip)])
-                        , (Second, [ (Hydrogen , Generator)])
-                        , (Third, [ (Lithium , Generator)])
+test_input = M.fromList [ (First, [ (Thulium, Microchip), (Plutonium , Microchip)])
+                        , (Second, [ (Thulium , Generator)])
+                        , (Third, [ (Plutonium , Generator)])
                         , (Fourth, [ ])
                         ]
 test_world = from_items test_input
