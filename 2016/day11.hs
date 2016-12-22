@@ -96,11 +96,14 @@ check_gen (n, ws) = if length ws == 0
     then error ("generation " ++ show n ++ " is too big: " ++ (show $ length ws))
     else all (not . is_complete) ws
 
+from_items :: ItemMap -> World
+from_items m = World { elevator=First
+                     , itemsByFloor=m
+                     }
+
 part_one :: ItemMap -> Int
 part_one input =
-    let w = World { elevator=First
-                  , itemsByFloor=input
-                  }
+    let w = from_items input
     in fst $ head $ dropWhile check_gen (world_factory w)
 
 --part_two :: String -> Int
@@ -111,9 +114,7 @@ test_input = M.fromList [ (First, [ (Hydrogen, Microchip), (Lithium , Microchip)
                         , (Third, [ (Lithium , Generator)])
                         , (Fourth, [ ])
                         ]
-test_world = World { elevator=First
-                   , itemsByFloor=test_input
-                   }
+test_world = from_items test_input
 
 main = do
 
