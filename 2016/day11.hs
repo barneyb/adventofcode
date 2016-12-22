@@ -84,34 +84,36 @@ tgt_floors First = [Second]
 tgt_floors Fourth = [Third]
 tgt_floors f = [pred f, succ f]
 
+world_factory :: World -> [Generation]
+world_factory w = scanl next_gen (0, [w]) [1..]
+
+next_gen :: Generation -> Int -> Generation
+next_gen (_, ws) n = (n, filter is_valid_world (concat $ map derive ws))
+
+check_gen :: Generation -> Bool
+check_gen (_, ws) = if length ws == 0
+    then error "empty generation before solving..."
+    else if length ws > 375000 -- 375-380K for the example
+    then error "generation is too big"
+    else all (not . is_complete) ws
+
 part_one :: ItemMap -> Int
 part_one input =
     let w = World { elevator=First
                   , itemsByFloor=input
                   }
-        world_factory = scanl next_gen (0, [w]) [1..]
-        gen = head $ dropWhile check_gen world_factory
-    in fst gen
-    where
-        next_gen :: Generation -> Int -> Generation
-        next_gen (_, ws) n = (n, filter is_valid_world (concat $ map derive ws))
-
-        check_gen :: Generation -> Bool
-        check_gen (_, ws) = if length ws == 0
-            then error "empty generation before solving..."
-            else if length ws > 375000
-            then error "generation is too big"
-            else all (not . is_complete) ws
+    in fst $ head $ dropWhile check_gen (world_factory w)
 
 --part_two :: String -> Int
 --part_two input = length input
 
+test_input = M.fromList [ (First, [ Microchip Hydrogen, Microchip Lithium ])
+                        , (Second, [ Generator Hydrogen ])
+                        , (Third, [ Generator Lithium ])
+                        , (Fourth, [ ])
+                        ]
+
 main = do
-    let test_input = M.fromList [ (First, [ Microchip Hydrogen, Microchip Lithium ])
-                                , (Second, [ Generator Hydrogen ])
-                                , (Third, [ Generator Lithium ])
-                                , (Fourth, [ ])
-                                ]
 
     print $ assert (is_valid_world World { elevator=First
                                          , itemsByFloor=test_input
