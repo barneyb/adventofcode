@@ -5,6 +5,8 @@ import qualified Data.Map.Strict as M
 import Debug.Trace
 import Utils
 
+type WorldSet = S.Set World
+
 data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium deriving (Eq, Ord, Bounded, Enum, Show)
 
 data Type = Generator | Microchip deriving (Eq, Ord, Enum, Show)
@@ -93,7 +95,7 @@ neighbors f
 world_factory :: World -> [Generation]
 world_factory w = map fst $ L.scanl next_gen ((0, [w]), S.empty) [1..]
 
-next_gen :: (Generation, S.Set World) -> Int -> (Generation, S.Set World)
+next_gen :: (Generation, WorldSet) -> Int -> (Generation, WorldSet)
 next_gen ((_, ws), aws) n =
     let drvd = concat $ map derive ws
         valid = filter is_valid_world drvd
@@ -101,7 +103,7 @@ next_gen ((_, ws), aws) n =
         l xs = show $ length xs
     in trace ("gen " ++ (show n) ++ ": from " ++ (l ws) ++ " derive " ++ (l drvd) ++ " with " ++ (l valid) ++ " valid and " ++ (l ws') ++ " new") ((n, ws'), aws')
     where
-        f :: ([World], S.Set World) -> World -> ([World], S.Set World)
+        f :: ([World], WorldSet) -> World -> ([World], WorldSet)
         f (ws, aws) w
             | S.member w aws = (ws, aws)
             | otherwise      = (w:ws, S.insert w aws)
