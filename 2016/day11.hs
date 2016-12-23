@@ -101,7 +101,7 @@ mods w =
     in concat $
         map (\tf ->
             map (\s ->
-                (tf, (e, snd s), (tf, (items w tf) ++ (fst s)))) splits) tfs
+                (tf, (e, snd s), (tf, (L.sort (items w tf) ++ (fst s))))) splits) tfs
 
 get_splits :: Ord a => [a] -> [([a], [a])]
 get_splits xs = map (\x -> ([x], L.delete x xs)) xs
@@ -200,7 +200,7 @@ main = do
 
     let r = part_one input
     print ((show r) ++ " generations")
-    print $ assert (0 == r) "part one passed!"
+    print $ assert (31 == r) "part one passed!"
 
 --     let r = part_two input
 --     print r
