@@ -126,8 +126,8 @@ next_gen ((_, ws), aws) n =
     let drvd = concat $ map derive ws
         valid = filter is_valid_world drvd
         (ws', aws') = L.foldl f ([], aws) valid
---         l xs = show $ length xs
-    in {-trace ("gen " ++ (show n) ++ ": from " ++ (l ws) ++ " derive " ++ (l drvd) ++ " with " ++ (l valid) ++ " valid and " ++ (l ws') ++ " new")-} ((n, ws'), aws')
+        l xs = show $ length xs
+    in trace ("gen " ++ (show n) ++ ": derived " ++ (l drvd) ++ " with " ++ (l valid) ++ " valid and " ++ (l ws') ++ " new") ((n, ws'), aws')
     where
         f :: ([World], WorldSet) -> World -> ([World], WorldSet)
         f (ws, aws) w
@@ -135,13 +135,13 @@ next_gen ((_, ws), aws) n =
             | otherwise      = (w:ws, S.insert w aws)
 
 check_gen :: Generation -> Bool
-check_gen (n, ws) = all (not . is_complete) ws
---     let l = length ws
---     in if null ws
---         then error ("generation " ++ show n ++ " is empty")
---         else if l > 400000
---         then error ("generation " ++ show n ++ " is too big: " ++ (show l))
---         else all (not . is_complete) ws
+check_gen (n, ws) =
+--     if null ws then
+--         error ("generation " ++ show n ++ " is empty")
+--     else if length ws > 400000 then
+--         error ("generation " ++ show n ++ " is too big: " ++ (show (length ws)))
+--     else
+        all (not . is_complete) ws
 
 from_el_items :: Floor -> ItemMap -> World
 from_el_items f m = World { elevator=f
@@ -198,13 +198,9 @@ main = do
     print "puzzle:"
     prints $ draw (from_items input)
 
-    let ws = snd $ head $ dropWhile (\(n, ws) -> n < 11) (world_factory (from_el_items First input))
-    print $ length ws
-    print $ Set.size (Set.fromList $ map hashWorld ws)
-
---     let r = part_one input
---     print ((show r) ++ " generations")
---     print $ assert (0 == r) "part one passed!"
+    let r = part_one input
+    print ((show r) ++ " generations")
+    print $ assert (0 == r) "part one passed!"
 
 --     let r = part_two input
 --     print r
