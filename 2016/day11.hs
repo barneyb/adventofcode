@@ -1,7 +1,8 @@
 import Control.Exception (assert)
 import qualified Data.List as L
+import qualified Data.Set as Set
 import qualified Data.HashSet as S
-import qualified Data.Hashable as H
+import Data.Hashable
 import qualified Data.Map.Strict as M
 import Debug.Trace
 import Utils
@@ -35,9 +36,9 @@ type WorldSet = S.HashSet World
 
 type Generation = (Int, [World])
 
-instance H.Hashable World where
+instance Hashable World where
 --     hashWithSalt :: Int -> a -> Int
-    hashWithSalt salt w = salt + hash (elevator w) (itemsByFloor w)
+    hashWithSalt salt = (+ salt) . hashWorld
 
 draw :: World -> [String]
 draw w = map (\f ->
@@ -57,8 +58,11 @@ draw w = map (\f ->
             | otherwise                 = ". "
 
 -- full of assorted primes!
-hash :: Floor -> ItemMap -> Int
-hash f m = M.foldlWithKey (\h f' is ->
+hashWorld :: World -> Int
+hashWorld w =
+    let f = elevator w
+        m = itemsByFloor w
+    in M.foldlWithKey (\h f' is ->
         (foldl (\h n -> h * 239 + n) (h * 101) $ map (\(e, t) ->
             (fromEnum f' * 349) * (fromEnum e * 193) + (fromEnum t * 163)) is)) (fromEnum f * 11) m
 
@@ -121,9 +125,9 @@ next_gen :: (Generation, WorldSet) -> Int -> (Generation, WorldSet)
 next_gen ((_, ws), aws) n =
     let drvd = concat $ map derive ws
         valid = filter is_valid_world drvd
-        (ws', aws') = L.foldl' f ([], aws) valid
-        l xs = show $ length xs
-    in trace ("gen " ++ (show n) ++ ": from " ++ (l ws) ++ " derive " ++ (l drvd) ++ " with " ++ (l valid) ++ " valid and " ++ (l ws') ++ " new") ((n, ws'), aws')
+        (ws', aws') = L.foldl f ([], aws) valid
+--         l xs = show $ length xs
+    in {-trace ("gen " ++ (show n) ++ ": from " ++ (l ws) ++ " derive " ++ (l drvd) ++ " with " ++ (l valid) ++ " valid and " ++ (l ws') ++ " new")-} ((n, ws'), aws')
     where
         f :: ([World], WorldSet) -> World -> ([World], WorldSet)
         f (ws, aws) w
@@ -131,15 +135,13 @@ next_gen ((_, ws), aws) n =
             | otherwise      = (w:ws, S.insert w aws)
 
 check_gen :: Generation -> Bool
-check_gen (n, ws) =
-    let l = length ws
-    in if null ws
-        then error ("generation " ++ show n ++ " is empty")
-        -- 375-380K for the example w/o nub
-        -- 425-450 (not K!) for the example w/ nub
-        else if l > 400000
-        then error ("generation " ++ show n ++ " is too big: " ++ (show l))
-        else all (not . is_complete) ws
+check_gen (n, ws) = all (not . is_complete) ws
+--     let l = length ws
+--     in if null ws
+--         then error ("generation " ++ show n ++ " is empty")
+--         else if l > 400000
+--         then error ("generation " ++ show n ++ " is too big: " ++ (show l))
+--         else all (not . is_complete) ws
 
 from_el_items :: Floor -> ItemMap -> World
 from_el_items f m = World { elevator=f
@@ -196,9 +198,13 @@ main = do
     print "puzzle:"
     prints $ draw (from_items input)
 
-    let r = part_one input
-    print ((show r) ++ " generations")
-    print $ assert (0 == r) "part one passed!"
+    let ws = snd $ head $ dropWhile (\(n, ws) -> n < 11) (world_factory (from_el_items First input))
+    print $ length ws
+    print $ Set.size (Set.fromList $ map hashWorld ws)
+
+--     let r = part_one input
+--     print ((show r) ++ " generations")
+--     print $ assert (0 == r) "part one passed!"
 
 --     let r = part_two input
 --     print r
