@@ -6,27 +6,38 @@ import qualified Data.Map.Strict as M
 import Debug.Trace
 import Utils
 
-type WorldSet = S.HashSet World
+data Element = Thulium
+             | Plutonium
+             | Strontium
+             | Promethium
+             | Ruthenium
+             deriving (Eq, Ord, Bounded, Enum, Show)
 
-data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium deriving (Eq, Ord, Bounded, Enum, Show)
+data Type = Generator
+          | Microchip
+          deriving (Eq, Ord, Enum, Show)
 
-data Type = Generator | Microchip deriving (Eq, Ord, Enum, Show)
+data Floor = First
+           | Second
+           | Third
+           | Fourth
+           deriving (Eq, Ord, Bounded, Enum, Show)
 
 type Item = (Element, Type)
 
-data Floor = First | Second | Third | Fourth deriving (Eq, Ord, Bounded, Enum, Show)
-
 type ItemMap = M.Map Floor [Item]
 
-data World = World { elevator :: Floor
+data World = World { elevator     :: Floor
                    , itemsByFloor :: ItemMap
                    } deriving (Eq, Ord, Show)
+
+type WorldSet = S.HashSet World
+
+type Generation = (Int, [World])
 
 instance H.Hashable World where
 --     hashWithSalt :: Int -> a -> Int
     hashWithSalt salt w = salt + hash (elevator w) (itemsByFloor w)
-
-type Generation = (Int, [World])
 
 draw :: World -> [String]
 draw w = map (\f ->
