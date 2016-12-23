@@ -1,11 +1,12 @@
 import Control.Exception (assert)
 import qualified Data.List as L
-import qualified Data.Set as S
+import qualified Data.HashSet as S
+import qualified Data.Hashable as H
 import qualified Data.Map.Strict as M
 import Debug.Trace
 import Utils
 
-type WorldSet = S.Set World
+type WorldSet = S.HashSet World
 
 data Element = Thulium | Plutonium | Strontium | Promethium | Ruthenium deriving (Eq, Ord, Bounded, Enum, Show)
 
@@ -20,6 +21,12 @@ type ItemMap = M.Map Floor [Item]
 data World = World { elevator :: Floor
                    , itemsByFloor :: ItemMap
                    } deriving (Eq, Ord, Show)
+
+instance H.Hashable World where
+--     hashWithSalt :: Int -> a -> Int
+    hashWithSalt salt w = salt + hash (elevator w) (itemsByFloor w)
+
+type Generation = (Int, [World])
 
 draw :: World -> [String]
 draw w = map (\f ->
@@ -38,7 +45,11 @@ draw w = map (\f ->
             | (e, t) `elem` (items w f) = head (show e) : [head (show t)]
             | otherwise                 = ". "
 
-type Generation = (Int, [World])
+-- full of assorted primes!
+hash :: Floor -> ItemMap -> Int
+hash f m = M.foldlWithKey (\h f' is ->
+        (foldl (\h n -> h * 239 + n) (h * 101) $ map (\(e, t) ->
+            (fromEnum f' * 349) * (fromEnum e * 193) + (fromEnum t * 163)) is)) (fromEnum f * 11) m
 
 is_valid_items :: [Item] -> Bool
 is_valid_items is =
@@ -115,7 +126,7 @@ check_gen (n, ws) =
         then error ("generation " ++ show n ++ " is empty")
         -- 375-380K for the example w/o nub
         -- 425-450 (not K!) for the example w/ nub
-        else if l > 100000
+        else if l > 400000
         then error ("generation " ++ show n ++ " is too big: " ++ (show l))
         else all (not . is_complete) ws
 
