@@ -217,6 +217,6 @@ main = do
     print "part two:"
     prints $ draw (from_items input2)
 
---     let r = part_one $ input2
---     print r
---     print $ assert (0 == r) "part two passed!"
+    let r = part_one $ input2
+    print r
+    print $ assert (55 == r) "part two passed!"
