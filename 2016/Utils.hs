@@ -4,6 +4,7 @@ module Utils
 , md5
 , nhash
 , prints
+, regexgrp
 , regexgrps
 , update
 ) where
@@ -36,6 +37,9 @@ update i x xs = take i xs ++ (x : drop (i + 1) xs)
 
 prints :: Show a => [a] -> IO ()
 prints xs = foldl1 (>>) $ map print xs
+
+regexgrp :: String -> String -> String
+regexgrp s r = head (regexgrps s r)
 
 regexgrps :: String -> String -> [String]
 regexgrps str regex =
