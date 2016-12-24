@@ -37,16 +37,18 @@ instance Hashable Floor
 
 type Item = (Element, Type)
 
-type ItemMap = M.Map Floor [Item]
+type Items = S.HashSet Item
+
+type ItemMap = M.Map Floor Items
 
 data World = World { elevator     :: Floor
                    , itemsByFloor :: ItemMap
-                   } deriving (Eq, Ord, Show)
+                   } deriving (Eq, Show)
 
 instance Hashable World where
     hashWithSalt salt w = M.foldlWithKey
         (\h f' is ->
-            (foldl (\s i -> hashWithSalt s i) (hashWithSalt h f') is))
+            (S.foldl' (\s i -> hashWithSalt s i) (hashWithSalt h f') is))
         (hashWithSalt salt (elevator w))
         (itemsByFloor w)
 
@@ -68,17 +70,17 @@ draw w = map (\f ->
 
         elp :: Floor -> Element -> Type -> String
         elp f e t
-            | (e, t) `elem` (items w f) = head (show e) : [head (show t)]
-            | otherwise                 = ". "
+            | S.member (e, t) (items w f) = head (show e) : [head (show t)]
+            | otherwise                   = ". "
 
 hashWorld :: World -> Int
 hashWorld = hashWithSalt 0
 
-is_valid_items :: [Item] -> Bool
+is_valid_items :: Items -> Bool
 is_valid_items is =
-    let gs = map fst $ filter ((== Generator) . snd) is
-        ms = map fst $ filter ((== Microchip) . snd) is
-    in (null gs) || (null ms) || (all (`elem` gs) ms)
+    let gs = S.map fst $ S.filter ((== Generator) . snd) is
+        ms = S.map fst $ S.filter ((== Microchip) . snd) is
+    in (S.null gs) || (S.null ms) || (S.null (S.difference ms gs))
 
 is_valid_world :: World -> Bool
 is_valid_world w = all is_valid_items (M.elems (itemsByFloor w))
@@ -88,9 +90,9 @@ is_complete w =
     let f1 = items w First
         f2 = items w Second
         f3 = items w Third
-    in L.all null [f1, f2, f3]
+    in all S.null [f1, f2, f3]
 
-items :: World -> Floor -> [Item]
+items :: World -> Floor -> Items
 items w f =
     let Just is = M.lookup f (itemsByFloor w)
     in is
@@ -99,17 +101,17 @@ derive :: World -> [World]
 derive w = map (\(tf, (f, is), (f', is')) ->
     from_el_items tf $ M.insert f is (M.insert f' is' (itemsByFloor w))) (mods w)
 
-mods :: World -> [(Floor, (Floor, [Item]), (Floor, [Item]))]
+mods :: World -> [(Floor, (Floor, Items), (Floor, Items))]
 mods w =
     let e = elevator w
-        is = items w e
+        is = S.toList $ items w e
         one_splits = get_splits is
         splits = one_splits ++ (split_again one_splits)
         tfs = neighbors e
     in concat $
         map (\tf ->
             map (\s ->
-                (tf, (e, snd s), (tf, (L.sort (items w tf) ++ (fst s))))) splits) tfs
+                (tf, (e, S.fromList (snd s)), (tf, S.union (items w tf) (S.fromList (fst s))))) splits) tfs
 
 get_splits :: Ord a => [a] -> [([a], [a])]
 get_splits xs = map (\x -> ([x], L.delete x xs)) xs
@@ -167,10 +169,10 @@ part_one input =
 --part_two :: String -> Int
 --part_two input = length input
 
-test_input = M.fromList [ (First, [ (Thulium, Microchip), (Plutonium , Microchip)])
-                        , (Second, [ (Thulium , Generator)])
-                        , (Third, [ (Plutonium , Generator)])
-                        , (Fourth, [ ])
+test_input = M.fromList [ (First , S.fromList [ (Thulium, Microchip), (Plutonium , Microchip) ])
+                        , (Second, S.singleton (Thulium , Generator))
+                        , (Third , S.singleton (Plutonium , Generator))
+                        , (Fourth, S.empty)
                         ]
 test_world = from_items test_input
 
@@ -197,10 +199,10 @@ main = do
     E  TG  TM  PG  .   SG  .   .   .   .   .
     -}
 
-    let input = M.fromList [ (First, [ (Thulium, Generator), (Thulium, Microchip), (Plutonium, Generator), (Strontium , Generator)])
-                           , (Second, [ (Plutonium, Microchip), (Strontium , Microchip)])
-                           , (Third, [ (Promethium, Generator), (Promethium, Microchip), (Ruthenium, Generator), (Ruthenium , Microchip)])
-                           , (Fourth, [ ])
+    let input = M.fromList [ (First , S.fromList [ (Thulium, Generator), (Thulium, Microchip), (Plutonium, Generator), (Strontium , Generator)])
+                           , (Second, S.fromList [ (Plutonium, Microchip), (Strontium , Microchip)])
+                           , (Third , S.fromList [ (Promethium, Generator), (Promethium, Microchip), (Ruthenium, Generator), (Ruthenium , Microchip)])
+                           , (Fourth, S.empty)
                            ]
 
     print "part one:"
@@ -210,7 +212,7 @@ main = do
     print ((show r) ++ " generations")
     print $ assert (31 == r) "part one passed!"
 
-    let input2 = M.insertWith (\o n -> L.sort (o++n)) First [ (Elerium, Generator), (Elerium, Microchip), (Dilithium, Generator), (Dilithium, Microchip) ] input
+    let input2 = M.insertWith S.union First (S.fromList [ (Elerium, Generator), (Elerium, Microchip), (Dilithium, Generator), (Dilithium, Microchip) ]) input
 
     print "part two:"
     prints $ draw (from_items input2)
