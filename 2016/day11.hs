@@ -1,8 +1,11 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 import Control.Exception (assert)
 import qualified Data.List as L
 import qualified Data.Set as Set
 import qualified Data.HashSet as S
 import Data.Hashable
+import GHC.Generics (Generic)
 import qualified Data.Map.Strict as M
 import Debug.Trace
 import Utils
@@ -12,17 +15,25 @@ data Element = Thulium
              | Strontium
              | Promethium
              | Ruthenium
-             deriving (Eq, Ord, Bounded, Enum, Show)
+             | Elerium
+             | Dilithium
+             deriving (Eq, Ord, Bounded, Enum, Show, Generic)
+
+instance Hashable Element
 
 data Type = Generator
           | Microchip
-          deriving (Eq, Ord, Enum, Show)
+          deriving (Eq, Ord, Enum, Show, Generic)
+
+instance Hashable Type
 
 data Floor = First
            | Second
            | Third
            | Fourth
-           deriving (Eq, Ord, Bounded, Enum, Show)
+           deriving (Eq, Ord, Bounded, Enum, Show, Generic)
+
+instance Hashable Floor
 
 type Item = (Element, Type)
 
@@ -32,13 +43,16 @@ data World = World { elevator     :: Floor
                    , itemsByFloor :: ItemMap
                    } deriving (Eq, Ord, Show)
 
+instance Hashable World where
+    hashWithSalt salt w = M.foldlWithKey
+        (\h f' is ->
+            (foldl (\s i -> hashWithSalt s i) (hashWithSalt h f') is))
+        (hashWithSalt salt (elevator w))
+        (itemsByFloor w)
+
 type WorldSet = S.HashSet World
 
 type Generation = (Int, [World])
-
-instance Hashable World where
---     hashWithSalt :: Int -> a -> Int
-    hashWithSalt salt = (+ salt) . hashWorld
 
 draw :: World -> [String]
 draw w = map (\f ->
@@ -57,14 +71,8 @@ draw w = map (\f ->
             | (e, t) `elem` (items w f) = head (show e) : [head (show t)]
             | otherwise                 = ". "
 
--- full of assorted primes!
 hashWorld :: World -> Int
-hashWorld w =
-    let f = elevator w
-        m = itemsByFloor w
-    in M.foldlWithKey (\h f' is ->
-        (foldl (\h n -> h * 239 + n) (h * 101) $ map (\(e, t) ->
-            (fromEnum f' * 349) * (fromEnum e * 193) + (fromEnum t * 163)) is)) (fromEnum f * 11) m
+hashWorld = hashWithSalt 0
 
 is_valid_items :: [Item] -> Bool
 is_valid_items is =
@@ -127,7 +135,7 @@ next_gen ((_, ws), aws) n =
         valid = filter is_valid_world drvd
         (ws', aws') = L.foldl f ([], aws) valid
         l xs = show $ length xs
-    in trace ("gen " ++ (show n) ++ ": derived " ++ (l drvd) ++ " with " ++ (l valid) ++ " valid and " ++ (l ws') ++ " new") ((n, ws'), aws')
+    in trace ("gen " ++ (show n) ++ ": derived " ++ (l drvd) ++ " with " ++ (l valid) ++ " valid and " ++ (l ws') ++ " new (" ++ (show $ S.size aws') ++ " total)") ((n, ws'), aws')
     where
         f :: ([World], WorldSet) -> World -> ([World], WorldSet)
         f (ws, aws) w
@@ -195,13 +203,18 @@ main = do
                            , (Fourth, [ ])
                            ]
 
-    print "puzzle:"
+    print "part one:"
     prints $ draw (from_items input)
 
     let r = part_one input
     print ((show r) ++ " generations")
     print $ assert (31 == r) "part one passed!"
 
---     let r = part_two input
+    let input2 = M.insertWith (\o n -> L.sort (o++n)) First [ (Elerium, Generator), (Elerium, Microchip), (Dilithium, Generator), (Dilithium, Microchip) ] input
+
+    print "part two:"
+    prints $ draw (from_items input2)
+
+--     let r = part_one $ input2
 --     print r
 --     print $ assert (0 == r) "part two passed!"
