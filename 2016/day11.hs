@@ -52,7 +52,7 @@ instance Hashable World where
         (hashWithSalt salt (elevator w))
         (itemsByFloor w)
 
-type WorldSet = S.HashSet World
+type Worlds = S.HashSet World
 
 type Generation = (Int, [World])
 
@@ -131,7 +131,7 @@ neighbors f
 world_factory :: World -> [Generation]
 world_factory w = map fst $ L.scanl next_gen ((0, [w]), S.empty) [1..]
 
-next_gen :: (Generation, WorldSet) -> Int -> (Generation, WorldSet)
+next_gen :: (Generation, Worlds) -> Int -> (Generation, Worlds)
 next_gen ((_, ws), aws) n =
     let drvd = concat $ map derive ws
         valid = filter is_valid_world drvd
@@ -139,7 +139,7 @@ next_gen ((_, ws), aws) n =
         l xs = show $ length xs
     in trace ("gen " ++ (show n) ++ ": derived " ++ (l drvd) ++ " with " ++ (l valid) ++ " valid and " ++ (l ws') ++ " new (" ++ (show $ S.size aws') ++ " total)") ((n, ws'), aws')
     where
-        f :: ([World], WorldSet) -> World -> ([World], WorldSet)
+        f :: ([World], Worlds) -> World -> ([World], Worlds)
         f (ws, aws) w
             | S.member w aws = (ws, aws)
             | otherwise      = (w:ws, S.insert w aws)
@@ -212,11 +212,11 @@ main = do
     print ((show r) ++ " generations")
     print $ assert (31 == r) "part one passed!"
 
-    let input2 = M.insertWith S.union First (S.fromList [ (Elerium, Generator), (Elerium, Microchip), (Dilithium, Generator), (Dilithium, Microchip) ]) input
-
-    print "part two:"
-    prints $ draw (from_items input2)
-
-    let r = part_one $ input2
-    print r
-    print $ assert (55 == r) "part two passed!"
+--     let input2 = M.insertWith S.union First (S.fromList [ (Elerium, Generator), (Elerium, Microchip), (Dilithium, Generator), (Dilithium, Microchip) ]) input
+--
+--     print "part two:"
+--     prints $ draw (from_items input2)
+--
+--     let r = part_one $ input2
+--     print r
+--     print $ assert (55 == r) "part two passed!"
