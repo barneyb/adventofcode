@@ -79,9 +79,8 @@ new_proc = array (A, D) [(r, 0) | r <- range(minBound, maxBound)]
 
 part_one :: String -> Int
 part_one input =
-    let proc = new_proc
-        proc' = execute proc (to_prog (parse input))
-    in proc'!A
+    let proc = execute new_proc (to_prog (parse input))
+    in proc!A
 
 --part_two :: String -> Int
 --part_two input = length input
@@ -90,7 +89,7 @@ test_input = "cpy 41 a\n\
              \inc a\n\
              \inc a\n\
              \dec a\n\
-             \jnz a 20\n\
+             \jnz a 5\n\
              \jnz 1 7\n\
              \jnz 0 1\n\
              \cpy a b\n\
@@ -100,7 +99,7 @@ test_instructions = [ Load 41 A
                     , Inc A
                     , Inc A
                     , Dec A
-                    , JumpNZ A 20
+                    , JumpNZ A 5
                     , Jump 7
                     , Jump 1 -- a no-op
                     , Copy A B
