@@ -82,6 +82,11 @@ part_one input =
     let proc = execute new_proc (to_prog (parse input))
     in proc!A
 
+part_two :: String -> Int
+part_two input =
+    let proc = execute (new_proc//[(C, 1)]) (to_prog (parse input))
+    in proc!A
+
 --part_two :: String -> Int
 --part_two input = length input
 
@@ -90,7 +95,7 @@ test_input = "cpy 41 a\n\
              \inc a\n\
              \dec a\n\
              \jnz a 5\n\
-             \jnz 1 7\n\
+             \jnz 1 -7\n\
              \jnz 0 1\n\
              \cpy a b\n\
              \dec a\n"
@@ -100,7 +105,7 @@ test_instructions = [ Load 41 A
                     , Inc A
                     , Dec A
                     , JumpNZ A 5
-                    , Jump 7
+                    , Jump (-7)
                     , Jump 1 -- a no-op
                     , Copy A B
                     , Dec A
@@ -122,6 +127,10 @@ main = do
     print r
     print $ assert (318117 == r) "part one passed!"
 
---     let r = part_two input
---     print r
---     print $ assert (0 == r) "part two passed!"
+    let r = part_two test_input
+    print r
+    print $ assert (42 == r) "example two passed!"
+
+    let r = part_two input
+    print r
+    print $ assert (9227771 == r) "part two passed!"
