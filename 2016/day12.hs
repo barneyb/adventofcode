@@ -2,6 +2,7 @@ import Control.Exception (assert)
 import qualified Data.List as L
 import qualified Data.Char as C
 import Data.Array
+import Debug.Trace
 import Utils
 
 data Register = A
@@ -61,13 +62,26 @@ to_prog :: [Instruction] -> Prog
 to_prog is = array (1, length is) (zip [1..] is)
 
 execute :: Proc -> Prog -> Proc
-execute proc prog = proc
+execute proc prog =
+    let end = trace ("exec " ++ (show (snd (bounds prog))) ++ " instructions") (snd (bounds prog))
+    in snd $ head $ dropWhile ((<= end) . fst) (scanl (\s@(i, _) _ -> f s (prog!i)) (1, proc) [1..])
+    where
+        f :: (Int, Proc) -> Instruction -> (Int, Proc)
+        f (i, p) (Copy r r') = (i + 1, p//[(r', p!r)])
+        f (i, p) (Load n r) = (i + 1, p//[(r, n)])
+        f (i, p) (Inc r) = (i + 1, p//[(r, (p!r) + 1)])
+        f (i, p) (Dec r) = (i + 1, p//[(r, (p!r) - 1)])
+        f (i, p) (Jump d) = (i + d, p)
+        f (i, p) (JumpNZ r d) = (i + if (p!r) == 0 then 1 else d, p)
+
+new_proc :: Proc
+new_proc = array (A, D) [(r, 0) | r <- range(minBound, maxBound)]
 
 part_one :: String -> Int
 part_one input =
-    let proc = array (A, D) [(r, 0) | r <- range(minBound, maxBound)]
+    let proc = new_proc
         proc' = execute proc (to_prog (parse input))
-    in proc!A
+    in proc'!A
 
 --part_two :: String -> Int
 --part_two input = length input
@@ -105,9 +119,9 @@ main = do
     print r
     print $ assert (42 == r) "example one passed!"
 
---     let r = part_one input
---     print r
---     print $ assert (0 == r) "part one passed!"
+    let r = part_one input
+    print r
+    print $ assert (318117 == r) "part one passed!"
 
 --     let r = part_two input
 --     print r
