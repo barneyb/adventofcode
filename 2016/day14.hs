@@ -22,18 +22,19 @@ is_key hash (n, h) =
 hashes :: (Int -> String) -> [(Int, String)]
 hashes hash = filter (is_key hash) (map (\i -> (i, hash i)) [0..])
 
-part_one :: String -> Int
-part_one salt =
-    let hs = drop 63 (hashes (nhash salt))
+search :: (Int -> String) -> Int
+search h =
+    let hs = drop 63 (hashes h)
     in fst $ head hs
+
+part_one :: String -> Int
+part_one salt = search (nhash salt)
 
 snhash :: Int -> String -> Int -> String
 snhash r salt n = L.foldl' (\h _ -> md5 h) (nhash salt n) [1..r]
 
 part_two :: String -> Int
-part_two salt =
-    let hs = drop 63 (hashes (snhash 2016 salt))
-    in fst $ head hs
+part_two salt = search (snhash 2016 salt)
 
 input = "ngcjuoqr"
 test_input = "abc"
