@@ -26,9 +26,6 @@ fill seed l =
 part_one :: String -> Int -> String
 part_one input l = chksum (fill input l)
 
---part_two :: String -> Int
---part_two input = length input
-
 test_input = "10000"
 
 main = do
@@ -54,6 +51,6 @@ main = do
     print r
     print $ assert ("10101001010100001" == r) "part one passed!"
 
---     let r = part_two input
---     print r
---     print $ assert (0 == r) "part two passed!"
+    let r = part_one input 35651584
+    print r
+    print $ assert ("10100001110101001" == r) "part two passed!"
