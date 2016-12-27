@@ -22,19 +22,19 @@ is_key hash (n, h) =
 hashes :: (Int -> String) -> [(Int, String)]
 hashes hash = filter (is_key hash) (map (\i -> (i, hash i)) [0..])
 
-search :: (Int -> String) -> Int
-search h =
-    let hs = drop 63 (hashes h)
+search :: Int -> (Int -> String) -> Int
+search n h =
+    let hs = drop (n - 1) (hashes h)
     in fst $ head hs
 
 part_one :: String -> Int
-part_one salt = search (nhash salt)
+part_one salt = search 64 (nhash salt)
 
 snhash :: Int -> String -> Int -> String
 snhash r salt n = L.foldl' (\h _ -> md5 h) (nhash salt n) [1..r]
 
 part_two :: String -> Int
-part_two salt = search (snhash 2016 salt)
+part_two salt = search 64 (snhash 2016 salt)
 
 input = "ngcjuoqr"
 test_input = "abc"
@@ -55,6 +55,8 @@ main = do
     print $ assert ("eec80a0c92dc8a0777c619d9bb51e910" == (snhash 1 "abc" 0)) "stretch test one passed"
     print $ assert ("16062ce768787384c81fe17a7a60c7e3" == (snhash 2 "abc" 0)) "stretch test two passed"
     print $ assert ("a107ff634856bb300138cac6568c0f24" == (snhash 2016 "abc" 0)) "stretch test 2016 passed"
+
+    print $ assert (10 == (search 1 (snhash 2016 "abc"))) "example test one passed"
 
 --     let r = part_two test_input
 --     print r
