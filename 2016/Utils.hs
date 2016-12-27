@@ -21,7 +21,7 @@ md5 s = show (hash (C.pack s) :: Digest MD5)
 
 -- taken from 2015's day 4 (and renamed from chash)
 nhash :: String -> Int -> String
-nhash key n = md5 (key ++ (show n))
+nhash salt n = md5 (salt ++ (show n))
 
 hist :: Ord a => [a] -> M.Map a Int
 hist = foldl (\m c -> M.insertWith (+) c 1 m) (M.empty)
