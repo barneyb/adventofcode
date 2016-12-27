@@ -8,23 +8,23 @@ find_triple (x:y:z:xs)
     | x == y && x == z = Just x
     | otherwise        = find_triple (y:z:xs)
 
-has_five :: String -> Int -> Char -> Bool
-has_five salt n c =
+has_five :: (Int -> String) -> Int -> Char -> Bool
+has_five hash n c =
     let five = [c, c, c, c, c]
-    in any (five `L.isInfixOf`) (map (nhash salt) [(n+1)..(n+1000)])
+    in any (five `L.isInfixOf`) (map hash [(n+1)..(n+1000)])
 
-is_key :: String -> (Int, String) -> Bool
-is_key salt (n, h) =
+is_key :: (Int -> String) -> (Int, String) -> Bool
+is_key hash (n, h) =
     let mc = find_triple h
-    in case mc of Just c  -> has_five salt n c
+    in case mc of Just c  -> has_five hash n c
                   Nothing -> False
 
-hashes :: String -> [(Int, String)]
-hashes salt = filter (is_key salt) (map (\i -> (i, nhash salt i)) [0..])
+hashes :: (Int -> String) -> [(Int, String)]
+hashes hash = filter (is_key hash) (map (\i -> (i, hash i)) [0..])
 
 part_one :: String -> Int
 part_one salt =
-    let hs = drop 63 (hashes salt)
+    let hs = drop 63 (hashes (nhash salt))
     in fst $ head hs
 
 --part_two :: String -> Int
