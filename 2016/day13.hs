@@ -40,9 +40,11 @@ step_count key start dest =
 part_one :: Int -> Int
 part_one input = step_count input (1, 1) (31, 39)
 
+point_count :: Key -> Point -> Int -> Int
+point_count key start steps = S.size $ S.unions $ map snd (take (steps + 1) (generations key start))
 
---part_two :: Int -> Int
---part_two input = length input
+part_two :: Int -> Int
+part_two input = point_count input (1, 1) 50
 
 test_grid = ".#.####.##\n\
             \..#..#...#\n\
@@ -73,6 +75,19 @@ main = do
     let r = part_one input
     print r
     print $ assert (86 == r) "part one passed!"
---     let r = part_two input
---     print r
---     print $ assert (0 == r) "part two passed!"
+
+    let r = point_count 10 (1, 1) 0
+    print r
+    print $ assert (1 == r) "test one passed!"
+
+    let r = point_count 10 (1, 1) 1
+    print r
+    print $ assert (3 == r) "test two passed!"
+
+    let r = point_count 10 (1, 1) 2
+    print r
+    print $ assert (5 == r) "test three passed!"
+
+    let r = part_two input
+    print r
+    print $ assert (127 == r) "part two passed!"
