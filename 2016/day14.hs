@@ -27,13 +27,20 @@ part_one salt =
     let hs = drop 63 (hashes (nhash salt))
     in fst $ head hs
 
---part_two :: String -> Int
---part_two input = length input
+snhash :: Int -> String -> Int -> String
+snhash r salt n = L.foldl' (\h _ -> md5 h) (nhash salt n) [1..r]
+
+part_two :: String -> Int
+part_two salt =
+    let hs = drop 63 (hashes (snhash 2016 salt))
+    in fst $ head hs
 
 input = "ngcjuoqr"
 test_input = "abc"
 
 main = do
+
+    print $ assert ("577571be4de9dcce85a041ba0410f29f" == (nhash "abc" 0)) "test one passed"
 
     let r = part_one test_input
     print r
@@ -42,6 +49,12 @@ main = do
     let r = part_one input
     print r
     print $ assert (18626 == r) "part one passed!"
+
+    print $ assert ("a107ff634856bb300138cac6568c0f24" == (snhash 2016 "abc" 0)) "stretch test two passed"
+
+--     let r = part_two test_input
+--     print r
+--     print $ assert (22551 == r) "example two passed!"
 
 --     let r = part_two input
 --     print r
