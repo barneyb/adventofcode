@@ -41,17 +41,20 @@ test_input = "abc"
 
 main = do
 
-    print $ assert ("577571be4de9dcce85a041ba0410f29f" == (nhash "abc" 0)) "test one passed"
+    print $ assert ("577571be4de9dcce85a041ba0410f29f" == (nhash "abc" 0)) "hash test one passed"
 
     let r = part_one test_input
     print r
     print $ assert (22728 == r) "example one passed!"
 
-    let r = part_one input
-    print r
-    print $ assert (18626 == r) "part one passed!"
+--     let r = part_one input
+--     print r
+--     print $ assert (18626 == r) "part one passed!"
 
-    print $ assert ("a107ff634856bb300138cac6568c0f24" == (snhash 2016 "abc" 0)) "stretch test two passed"
+    print $ assert ("577571be4de9dcce85a041ba0410f29f" == (snhash 0 "abc" 0)) "stretch test zero passed"
+    print $ assert ("eec80a0c92dc8a0777c619d9bb51e910" == (snhash 1 "abc" 0)) "stretch test one passed"
+    print $ assert ("16062ce768787384c81fe17a7a60c7e3" == (snhash 2 "abc" 0)) "stretch test two passed"
+    print $ assert ("a107ff634856bb300138cac6568c0f24" == (snhash 2016 "abc" 0)) "stretch test 2016 passed"
 
 --     let r = part_two test_input
 --     print r
