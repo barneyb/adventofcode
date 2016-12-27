@@ -6,11 +6,19 @@ part_one input = length input
 --part_two :: String -> Int
 --part_two input = length input
 
+test_input = ""
+
 main = do
     input <- readFile "day_input.txt"
+
+    let r = part_one test_input
+    print r
+    print $ assert (0 == r) "example one passed!"
+
     let r = part_one input
     print r
     print $ assert (0 == r) "part one passed!"
+
 --     let r = part_two input
 --     print r
 --     print $ assert (0 == r) "part two passed!"
