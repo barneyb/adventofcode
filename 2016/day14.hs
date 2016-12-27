@@ -1,6 +1,7 @@
 import Control.Exception (assert)
 import qualified Data.List as L
 import Utils
+import Data.Function.Memoize
 
 find_triple :: String -> Maybe Char
 find_triple (x:y:[]) = Nothing
@@ -31,7 +32,7 @@ part_one :: String -> Int
 part_one salt = search 64 (nhash salt)
 
 part_two :: String -> Int
-part_two salt = search 64 (snhash 2016 salt)
+part_two salt = search 64 (memoize (snhash 2016 salt))
 
 input = "ngcjuoqr"
 test_input = "abc"
@@ -53,12 +54,14 @@ main = do
     print $ assert ("16062ce768787384c81fe17a7a60c7e3" == (snhash 2 "abc" 0)) "stretch test two passed"
     print $ assert ("a107ff634856bb300138cac6568c0f24" == (snhash 2016 "abc" 0)) "stretch test 2016 passed"
 
-    print $ assert (10 == (search 1 (snhash 2016 "abc"))) "example test one passed"
+    print $ assert (10 == (search 1 (traceMemoize (snhash 2016 "abc")))) "example test one passed"
 
+    -- this takes a couple minutes to run....
 --     let r = part_two test_input
 --     print r
 --     print $ assert (22551 == r) "example two passed!"
 
---     let r = part_two input
---     print r
---     print $ assert (0 == r) "part two passed!"
+    -- this takes a couple minutes to run....
+    let r = part_two input
+    print r
+    print $ assert (20092 == r) "part two passed!"
