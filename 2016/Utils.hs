@@ -3,6 +3,7 @@ module Utils
 , hist
 , md5
 , nhash
+, snhash
 , prints
 , regexgrp
 , regexgrps
@@ -22,6 +23,10 @@ md5 s = show (hash (C.pack s) :: Digest MD5)
 -- taken from 2015's day 4 (and renamed from chash)
 nhash :: String -> Int -> String
 nhash salt n = md5 (salt ++ (show n))
+
+-- a "stretched" variant of nhash: `nhash == (snhash 0)`
+snhash :: Int -> String -> Int -> String
+snhash r salt n = L.foldl' (\h _ -> md5 h) (nhash salt n) [1..r]
 
 hist :: Ord a => [a] -> M.Map a Int
 hist = foldl (\m c -> M.insertWith (+) c 1 m) (M.empty)

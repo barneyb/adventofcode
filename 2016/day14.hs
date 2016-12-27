@@ -30,9 +30,6 @@ search n h =
 part_one :: String -> Int
 part_one salt = search 64 (nhash salt)
 
-snhash :: Int -> String -> Int -> String
-snhash r salt n = L.foldl' (\h _ -> md5 h) (nhash salt n) [1..r]
-
 part_two :: String -> Int
 part_two salt = search 64 (snhash 2016 salt)
 
