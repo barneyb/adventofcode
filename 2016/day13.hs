@@ -29,10 +29,12 @@ draw k (x, y) (x', y') = map (\r ->
 step :: Key -> Point -> S.HashSet Point
 step key (x, y) = S.fromList $ filter (is_open key) [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
 
+generations :: Key -> Point -> [Generation]
+generations key start = scanl (\(_, ps) n -> (n, S.unions (map (step key) (S.toList ps)))) (0, S.singleton start) [1..]
+
 step_count :: Key -> Point -> Point -> Int
 step_count key start dest =
-    let gens = scanl (\(_, ps) n -> (n, S.unions (map (step key) (S.toList ps)))) (0, S.singleton start) [1..]
-        gen = head $ dropWhile (\g -> not (S.member dest (snd g))) gens
+    let gen = head $ dropWhile (\g -> not (S.member dest (snd g))) (generations key start)
     in fst gen
 
 part_one :: Int -> Int
