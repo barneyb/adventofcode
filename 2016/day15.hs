@@ -20,8 +20,8 @@ part_one ds = head $ dropWhile pred [0..]
         pred :: Int -> Bool
         pred t = any (not . (is_open t)) ds
 
---part_two :: String -> Int
---part_two input = length input
+part_two :: [Disc] -> Int
+part_two ds = part_one (ds ++ [Disc (1 + (length ds)) 11 0])
 
 test_input = "Disc #1 has 5 positions; at time=0, it is at position 4.\n\
              \Disc #2 has 2 positions; at time=0, it is at position 1."
@@ -40,6 +40,6 @@ main = do
     print r
     print $ assert (400589 == r) "part one passed!"
 
---     let r = part_two input
---     print r
---     print $ assert (0 == r) "part two passed!"
+    let r = part_two discs
+    print r
+    print $ assert (3045959 == r) "part two passed!"
