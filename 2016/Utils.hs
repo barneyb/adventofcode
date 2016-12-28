@@ -21,10 +21,10 @@ import Text.Regex.TDFA
 assert_equal :: (Eq a, Show a) => a -> a -> String -> IO ()
 assert_equal expected actual message = putStrLn ("[Test: " ++ message ++ "]") >>
     if expected == actual
-        then putStrLn "PASS!"
+        then putStrLn "pass"
         else putStrLns [ "expected : " ++ (show expected)
                        , "actual   : " ++ (show actual)
-                       , "FAILURE"
+                       , "==> FAILURE!"
                        ]
 
 -- taken from 2015's day 4
