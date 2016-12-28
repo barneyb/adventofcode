@@ -5,6 +5,7 @@ module Utils
 , nhash
 , snhash
 , prints
+, putStrLns
 , regexgrp
 , regexgrps
 , update
@@ -41,7 +42,10 @@ update :: Int -> a -> [a] -> [a]
 update i x xs = take i xs ++ (x : drop (i + 1) xs)
 
 prints :: Show a => [a] -> IO ()
-prints xs = foldl1 (>>) $ map print xs
+prints xs = putStrLns (map show xs)
+
+putStrLns :: [String] -> IO ()
+putStrLns ss = foldl1 (>>) $ map putStrLn ss
 
 regexgrp :: String -> String -> String
 regexgrp s r = head (regexgrps s r)
