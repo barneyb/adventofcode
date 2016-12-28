@@ -1,18 +1,17 @@
 import Control.Exception (assert)
 import Utils
 
-is_trap :: (Bool, Bool, Bool) -> Bool
-is_trap (True, True, False) = True
-is_trap (False, True, True) = True
-is_trap (True, False, False) = True
-is_trap (False, False, True) = True
-is_trap _ = False
+is_trap :: (Char, Char, Char) -> Char
+is_trap ('^', '^', '.') = '^'
+is_trap ('.', '^', '^') = '^'
+is_trap ('^', '.', '.') = '^'
+is_trap ('.', '.', '^') = '^'
+is_trap _ = '.'
 
 next_line :: String -> String
 next_line s =
-    let ts = False : (map (== '^') s) ++ [False]
-        ts' = map (\i -> is_trap (ts !! (i-1), ts !! i, ts !! (i+1))) [1..(length s)]
-    in map (\v -> if v then '^' else '.') ts'
+    let ts = '.' : s ++ ['.']
+    in map (\i -> is_trap (ts !! (i-1), ts !! i, ts !! (i+1))) [1..(length s)]
 
 tiles :: String -> Int -> [String]
 tiles first_row row_count = scanl (\l _ -> next_line l) first_row [2..row_count]
@@ -64,4 +63,4 @@ main = do
 
     assert_equal 1956 (part_one input 40) "part one"
 
---     assert_equal 0 (part_two input) "part two"
+    assert_equal 19995121 (part_one input 400000) "part two"
