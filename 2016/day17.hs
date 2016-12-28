@@ -49,7 +49,7 @@ equals :: (Eq a, Show a) => a -> a -> String -> IO ()
 equals expected actual message = putStrLn ("[Test: " ++ message ++ "]") >>
     if expected == actual
         then putStrLn "PASS!"
-        else prints [ "expected : " ++ (show expected)
+        else putStrLns [ "expected : " ++ (show expected)
                        , "actual   : " ++ (show actual)
                        , "FAILURE"
                        ]
