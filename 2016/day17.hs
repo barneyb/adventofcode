@@ -45,22 +45,13 @@ part_two input =
     let Just (Pos _ _ path) = walk (\s -> md5 (input ++ s)) (>) (Pos 1 1 "")
     in length path
 
-equals :: (Eq a, Show a) => a -> a -> String -> IO ()
-equals expected actual message = putStrLn ("[Test: " ++ message ++ "]") >>
-    if expected == actual
-        then putStrLn "PASS!"
-        else putStrLns [ "expected : " ++ (show expected)
-                       , "actual   : " ++ (show actual)
-                       , "FAILURE"
-                       ]
-
 main = do
     let input = "veumntbg"
 
-    equals "DDRRRD" (part_one "ihgpwlah") "example one"
-    equals "DDUDRLRRUDRD" (part_one "kglvqrro") "example two"
-    equals "DRURDRUDDLLDLUURRDULRLDUUDDDRR" (part_one "ulqzkmiv") "example three"
+    assert_equal "DDRRRD" (part_one "ihgpwlah") "example one"
+    assert_equal "DDUDRLRRUDRD" (part_one "kglvqrro") "example two"
+    assert_equal "DRURDRUDDLLDLUURRDULRLDUUDDDRR" (part_one "ulqzkmiv") "example three"
 
-    equals "DDRRULRDRD" (part_one input) "part one"
+    assert_equal "DDRRULRDRD" (part_one input) "part one"
 
-    equals 536 (part_two input) "part two"
+    assert_equal 536 (part_two input) "part two"

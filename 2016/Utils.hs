@@ -1,5 +1,6 @@
 module Utils
-( freq
+( assert_equal
+, freq
 , hist
 , md5
 , nhash
@@ -16,6 +17,15 @@ import qualified Data.ByteString.Char8 as C
 import qualified Data.Map.Strict as M
 import qualified Data.List as L
 import Text.Regex.TDFA
+
+assert_equal :: (Eq a, Show a) => a -> a -> String -> IO ()
+assert_equal expected actual message = putStrLn ("[Test: " ++ message ++ "]") >>
+    if expected == actual
+        then putStrLn "PASS!"
+        else putStrLns [ "expected : " ++ (show expected)
+                       , "actual   : " ++ (show actual)
+                       , "FAILURE"
+                       ]
 
 -- taken from 2015's day 4
 md5 :: String -> String
