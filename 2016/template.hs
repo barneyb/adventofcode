@@ -1,4 +1,5 @@
 import Control.Exception (assert)
+import Utils
 
 part_one :: String -> Int
 part_one input = length input
@@ -11,14 +12,8 @@ test_input = ""
 main = do
     input <- readFile "day_input.txt"
 
-    let r = part_one test_input
-    print r
-    print $ assert (0 == r) "example one passed!"
+    assert_equal 0 (part_one test_input) "example one"
 
-    let r = part_one input
-    print r
-    print $ assert (0 == r) "part one passed!"
+    assert_equal 0 (part_one input) "part one"
 
---     let r = part_two input
---     print r
---     print $ assert (0 == r) "part two passed!"
+--     assert_equal 0 (part_two input) "part two"
