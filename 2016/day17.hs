@@ -1,4 +1,3 @@
-import Control.Exception (assert)
 import qualified Data.List as L
 import Debug.Trace
 import Utils
