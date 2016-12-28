@@ -47,9 +47,13 @@ part_two input =
     in length path
 
 equals :: (Eq a, Show a) => a -> a -> String -> IO ()
-equals expected actual message
-    | expected == actual = print ("[PASS   ] " ++ message)
-    | otherwise          = prints ["expected : " ++ (show expected), "actual   : " ++ (show actual), "[FAILURE] " ++ message]
+equals expected actual message = putStrLn ("[Test: " ++ message ++ "]") >>
+    if expected == actual
+        then putStrLn "PASS!"
+        else prints [ "expected : " ++ (show expected)
+                       , "actual   : " ++ (show actual)
+                       , "FAILURE"
+                       ]
 
 main = do
     let input = "veumntbg"
