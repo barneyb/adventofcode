@@ -17,8 +17,8 @@ derive hf (Pos x y path) =
                    , Pos (x+1) y     (path++"R")
                    ])
 
-walk :: (String -> String) -> Pos -> Maybe Pos
-walk hf p = go p
+walk :: (String -> String) -> (Int -> Int -> Bool) -> Pos -> Maybe Pos
+walk hf plt p = go p
     where
         go :: Pos -> Maybe Pos
         go p@(Pos 4 4 path) = Just p
@@ -27,7 +27,10 @@ walk hf p = go p
                 nexts' = filter f nexts
             in if length nexts' == 0
                 then Nothing
-                else head $ L.sortBy (\(Just (Pos _ _ p)) (Just (Pos _ _ p')) -> compare (length p) (length p')) nexts'
+                else head $ L.sortBy (\(Just (Pos _ _ p)) (Just (Pos _ _ p')) ->
+                    let l = length p
+                        l' = length p'
+                    in if l == l' then EQ else if l `plt` l' then LT else GT) nexts'
 
         f :: Maybe Pos -> Bool
         f Nothing = False
@@ -35,11 +38,13 @@ walk hf p = go p
 
 part_one :: String -> String
 part_one input =
-    let Just (Pos _ _ path) = walk (\s -> md5 (input ++ s)) (Pos 1 1 "")
+    let Just (Pos _ _ path) = walk (\s -> md5 (input ++ s)) (<) (Pos 1 1 "")
     in path
 
---part_two :: String -> String
---part_two input = md5 input
+part_two :: String -> Int
+part_two input =
+    let Just (Pos _ _ path) = walk (\s -> md5 (input ++ s)) (>) (Pos 1 1 "")
+    in length path
 
 equals :: (Eq a, Show a) => a -> a -> String -> IO ()
 equals expected actual message
@@ -55,6 +60,4 @@ main = do
 
     equals "DDRRULRDRD" (part_one input) "part one"
 
---     let r = part_two input
---     print r
---     print $ assert (0 == r) "part two passed!"
+    equals 536 (part_two input) "part two"
