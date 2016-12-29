@@ -13,11 +13,14 @@ parse s =
 ranges :: String -> [Range]
 ranges s = L.sort $ map parse (lines s)
 
+holes :: [Range] -> [Range]
+holes rs =
+    let (hs, e) = foldl (\(hs, s) (l, h) -> (hs++[(s, l)], h)) ([], 0) rs
+    in (hs ++ [(e, 4294967295)])
+
 part_one :: String -> Int
 part_one input =
-    let rs = ranges input
-        (hs, _) = foldl (\(hs, s) (l, h) -> (hs++[(s, l)], h)) ([], 0) rs
-        hs' = filter (\(l, h) -> l + 1 < h) hs
+    let hs' = filter (\(l, h) -> l + 1 < h) (holes (ranges input))
         (l, h) = head hs'
     in l + 1
 
