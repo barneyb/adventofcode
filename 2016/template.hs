@@ -1,4 +1,3 @@
-import Control.Exception (assert)
 import Utils
 
 part_one :: String -> Int
