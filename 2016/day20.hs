@@ -39,8 +39,8 @@ part_one r input =
         (l, h) = head hs'
     in l + 1
 
--- part_two :: Range -> String -> Int
--- part_two r input = length input
+part_two :: Range -> String -> Int
+part_two r input = sum $ map (\(l, h) -> h - l) (holes r (ranges input))
 
 test_input = "5-8\n\
              \0-2\n\
@@ -56,6 +56,6 @@ main = do
 
     assert_equal 19449262 (part_one (0, 4294967295) input) "part one"
 
---     assert_equal 2 (part_two (0, 9) test_input) "example two"
+    assert_equal 2 (part_two (0, 9) test_input) "example two"
 
---     assert_equal 0 (part_two (0, 4294967295) input) "part two"
+    assert_equal 0 (part_two (0, 4294967295) input) "part two"
