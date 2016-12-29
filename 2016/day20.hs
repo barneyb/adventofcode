@@ -1,4 +1,4 @@
-import Control.Exception (assert)
+import Debug.Trace
 import qualified Data.List as L
 import Utils
 
@@ -13,19 +13,19 @@ parse s =
 ranges :: String -> [Range]
 ranges s = L.sort $ map parse (lines s)
 
-holes :: [Range] -> [Range]
-holes rs =
-    let (hs, e) = foldl (\(hs, s) (l, h) -> (hs++[(s, l)], h)) ([], 0) rs
-    in (hs ++ [(e, 4294967295)])
+holes :: Range -> [Range] -> [Range]
+holes (s, e) rs =
+    let (hs, e') = foldl (\(hs, s) (l, h) -> (hs++[(s, l)], h)) ([], s) rs
+    in (hs ++ [(e', e)])
 
-part_one :: String -> Int
-part_one input =
-    let hs' = filter (\(l, h) -> l + 1 < h) (holes (ranges input))
+part_one :: Range -> String -> Int
+part_one r input =
+    let hs' = filter (\(l, h) -> l + 1 < h) (holes r (ranges input))
         (l, h) = head hs'
     in l + 1
 
---part_two :: String -> Int
---part_two input = length input
+-- part_two :: Range -> String -> Int
+-- part_two r input = length input
 
 test_input = "5-8\n\
              \0-2\n\
@@ -34,8 +34,13 @@ test_input = "5-8\n\
 main = do
     input <- readFile "day20_input.txt"
 
-    assert_equal 3 (part_one test_input) "example one"
+--     assert_equal [(0,2),(4,8)] (ranges test_input) "example ranges"
+--     assert_equal [(3,3),(9,9)] (holes (0, 9) (ranges test_input)) "example holes"
 
-    assert_equal 19449262 (part_one input) "part one"
+    assert_equal 3 (part_one (0, 9) test_input) "example one"
 
---     assert_equal 0 (part_two input) "part two"
+    assert_equal 19449262 (part_one (0, 4294967295) input) "part one"
+
+--     assert_equal 2 (part_two (0, 9) test_input) "example two"
+
+--     assert_equal 0 (part_two (0, 4294967295) input) "part two"
