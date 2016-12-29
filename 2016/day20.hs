@@ -11,16 +11,31 @@ parse s =
     in (ns!!0, ns!!1)
 
 ranges :: String -> [Range]
-ranges s = L.sort $ map parse (lines s)
+ranges s = unify $ map parse (lines s)
+
+unify :: [Range] -> [Range]
+unify rs = reverse (foldl f [] (L.sort rs))
+    where
+        f :: [Range] -> Range -> [Range]
+        f [] r = [r]
+        f rs@((l, h):rst) r@(l', h')
+            | l' <= h   = (l, max h h'):rst
+            | otherwise = r:rs
 
 holes :: Range -> [Range] -> [Range]
 holes (s, e) rs =
-    let (hs, e') = foldl (\(hs, s) (l, h) -> (hs++[(s, l)], h)) ([], s) rs
-    in (hs ++ [(e', e)])
+    let (hs, e') = foldl f ([], s) rs
+        hs' = if e > e' then (hs ++ [(e', e)]) else hs
+    in hs'
+    where
+        f :: ([Range], Int) -> Range -> ([Range], Int)
+        f (hs, s) (l, h)
+            | l <= s    = (hs, h)
+            | otherwise = (hs++[(s, l-1)], h)
 
 part_one :: Range -> String -> Int
 part_one r input =
-    let hs' = filter (\(l, h) -> l + 1 < h) (holes r (ranges input))
+    let hs' = filter (\(l, h) -> l < h) (holes r (ranges input))
         (l, h) = head hs'
     in l + 1
 
@@ -34,8 +49,8 @@ test_input = "5-8\n\
 main = do
     input <- readFile "day20_input.txt"
 
---     assert_equal [(0,2),(4,8)] (ranges test_input) "example ranges"
---     assert_equal [(3,3),(9,9)] (holes (0, 9) (ranges test_input)) "example holes"
+    assert_equal [(0,2),(4,8)] (ranges test_input) "example ranges"
+    assert_equal [(2,3),(8,9)] (holes (0, 9) (ranges test_input)) "example holes"
 
     assert_equal 3 (part_one (0, 9) test_input) "example one"
 
