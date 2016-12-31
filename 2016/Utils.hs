@@ -22,10 +22,16 @@ assert_equal :: (Eq a, Show a) => a -> a -> String -> IO ()
 assert_equal expected actual message = putStrLn ("[Test: " ++ message ++ "]") >>
     if expected == actual
         then putStrLn "pass"
-        else putStrLns [ "expected : " ++ (show expected)
-                       , "actual   : " ++ (show actual)
-                       , "==> FAILURE!"
-                       ]
+        else
+            let se = show expected
+                sa = show actual
+                ls = [ "expected : " ++ se
+                     , "actual   : " ++ sa
+                     ]
+                ls' = if (min (length se) (length sa)) > 40
+                    then ls ++ ["diff     : " ++ (map (\(e, a) -> if e == a then ' ' else '^') (zip se sa))]
+                    else ls
+            in putStrLns (ls' ++ ["==> FAILURE!"])
 
 -- taken from 2015's day 4
 md5 :: String -> String
