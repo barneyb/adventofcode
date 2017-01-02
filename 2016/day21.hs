@@ -1,4 +1,5 @@
 import qualified Data.List as L
+import qualified Data.Sequence as S
 import Debug.Trace
 import Utils
 
@@ -22,10 +23,7 @@ execute s (SwapLetter a b) =
     let Just x = (L.elemIndex a s)
         Just y = (L.elemIndex b s)
     in execute s (SwapPosition x y)
-execute s (RotateLeft n) =
-    let n' = n `mod` (length s)
-        pre = take n' s
-    in (drop n' s) ++ pre
+execute s (RotateLeft n) = rotate_left s n
 execute s (RotateRight n) =
     let n' = (length s) - n
     in execute s (RotateLeft n')
@@ -44,8 +42,29 @@ execute s (Move x y) =
     let s' = (take x s) ++ (drop (x + 1) s)
     in (take y s') ++ [s!!x] ++ (drop y s')
 
+rotate_left :: String -> Int -> String
+rotate_left s n =
+    let n' = n `mod` (length s)
+        pre = take n' s
+    in (drop n' s) ++ pre
+
+unexecute :: String -> Cmd -> String
+unexecute s (SwapPosition x y) = execute s (SwapPosition y x)
+unexecute s (SwapLetter a b) = execute s (SwapLetter b a)
+unexecute s (RotateLeft n) = execute s (RotateRight n)
+unexecute s (RotateRight n) = execute s (RotateLeft n)
+unexecute s (RotateIndex c) =
+    let s's = map (\i -> rotate_left s i) [0..((length s) - 1)]
+        s' = filter (\s' -> s == execute s' (RotateIndex c)) s's
+    in head s'
+unexecute s (Move x y) = execute s (Move y x)
+unexecute s (Reverse x y) = execute s (Reverse x y)
+
 run :: [Cmd] -> String -> [String]
 run is s = L.scanl execute s is
+
+unrun :: [Cmd] -> String -> [String]
+unrun is s = L.scanl unexecute s (reverse is)
 
 parse :: String -> Cmd
 parse s
@@ -76,8 +95,10 @@ part_one input passwd =
     let cmds = map parse (lines input)
     in last (run cmds passwd)
 
---part_two :: String -> Int
---part_two input = length input
+part_two :: String -> String -> String
+part_two input passwd =
+    let cmds = map parse (lines input)
+    in last (unrun cmds passwd)
 
 test_input = "swap position 4 with position 0\n\
              \swap letter d with letter b\n\
@@ -128,8 +149,34 @@ main = do
 
     assert_equal test_scan (run test_cmds "abcde") "test run"
 
+    foldl1 (>>) (map (\c ->
+        assert_equal "abcde" (unexecute (execute "abcde" c) c) ("test symmetry on " ++ (show c))) test_cmds)
+
     assert_equal "decab" (part_one test_input "abcde") "example one"
 
     assert_equal "gfdhebac" (part_one input "abcdefgh") "part one"
 
---     assert_equal 0 (part_two input) "part two"
+    assert_equal "eabcd" (execute "abcde" (RotateIndex 'a')) "rotate a"
+    assert_equal "deabc" (execute "abcde" (RotateIndex 'b')) "rotate b"
+    assert_equal "cdeab" (execute "abcde" (RotateIndex 'c')) "rotate c"
+    assert_equal "bcdea" (execute "abcde" (RotateIndex 'd')) "rotate d"
+    assert_equal "eabcd" (execute "abcde" (RotateIndex 'e')) "rotate e"
+
+    assert_equal "cdeab" (execute "deabc" (RotateIndex 'c')) "rotate c 1"
+    assert_equal "cdeab" (execute "abcde" (RotateIndex 'c')) "rotate c 1"
+
+    assert_equal "abcde" (unexecute "eabcd" (RotateIndex 'a')) "unrotate a"
+    assert_equal "abcde" (unexecute "deabc" (RotateIndex 'b')) "unrotate b"
+    -- this one ends up with two equvalent rotations, which is "illegal" (because it's not unambiguously reversable)
+--     assert_equal "abcde" (unexecute "cdeab" (RotateIndex 'c')) "unrotate c"
+    assert_equal "abcde" (unexecute "bcdea" (RotateIndex 'd')) "unrotate d"
+    assert_equal "abcde" (unexecute "eabcd" (RotateIndex 'e')) "unrotate e"
+
+    assert_equal (reverse test_scan) (unrun test_cmds "decab") "test unrun"
+
+    assert_equal "abcde" (part_two test_input "decab") "example two"
+
+    assert_equal "abcdefgh" (part_two input "gfdhebac") "part one two"
+
+    assert_equal "dhaegfbc" (part_two input "fbgdceah") "part two"
+
